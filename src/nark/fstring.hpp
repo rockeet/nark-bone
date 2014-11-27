@@ -492,7 +492,7 @@ struct fstring_func {
 	struct equal_align {
 		HSM_FORCE_INLINE
 		bool operator()(const fstring x, const fstring y) const {
-			if (HSM_unlikely(x.n != y.n))
+			if (nark_unlikely(x.n != y.n))
 				return false;
 			ptrdiff_t c = x.n - (SP_ALIGN-1);
 			ptrdiff_t i = 0;
@@ -509,7 +509,7 @@ struct fstring_func {
 	struct equal { // align or not align
 		HSM_FORCE_INLINE
 		bool operator()(const fstring x, const fstring y) const {
-			if (HSM_unlikely(x.n != y.n))
+			if (nark_unlikely(x.n != y.n))
 				return false;
 			if (((intptr_t(x.p) | intptr_t(y.p)) & (SP_ALIGN-1)) == 0) {
 				ptrdiff_t c = x.n - (SP_ALIGN-1);
