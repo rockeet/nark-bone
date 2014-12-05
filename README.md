@@ -18,7 +18,7 @@ $ make
 * [Lexical Cast](#lexical-cast)
 * [Read text lines](#read-text-lines)
 
-### valvec
+### <a name="valvec"></a>valvec
 `nark::valvec` is a alternative to `std::vector`, it use `malloc`/`realloc`/`free`
 to manage memory. `Type` of `nark::valvec<Type>` must be [memmove-able](#memmove-able).
 
@@ -62,14 +62,14 @@ supporting DFA memory map in an graceful way.
    }
 ```
 
-### memmove-able
+### <a name="memmove-able"></a>memmove-able
 When memmove an object `x` to another memory block `y` without destruct `x`,
 if `y` can be used as it is `x`, then `x` is memmove-able.
 
 For example, gnu `std::list,map,set`... are not memmove-able, because they
 have self-references.
 
-### Lexical Cast
+### <a name="lexical-cast"></a>Lexical Cast
 Both compiling and running are much fast than `boost::lexical_cast`.
 ```c++
 #include <febird/lcast.hpp>
@@ -81,7 +81,7 @@ Both compiling and running are much fast than `boost::lexical_cast`.
 	double d = nark::lcast("1.23");
 ```
 
-### Read text lines
+### <a name="read-text-lines"></a>Read text lines
 ```c++
 #include <febird/util/linebuf.hpp>
 
