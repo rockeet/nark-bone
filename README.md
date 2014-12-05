@@ -15,8 +15,8 @@ $ make
 
 ## Components
 * [valvec](#valvec)
-* [Lexical Cast](#Lexical-Cast)
-* [Read text lines](#Read-text-lines)
+* [Lexical Cast](#lexical-cast)
+* [Read text lines](#read-text-lines)
 
 ### valvec
 `nark::valvec` is a alternative to `std::vector`, it use `malloc`/`realloc`/`free`
