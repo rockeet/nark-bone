@@ -1,4 +1,5 @@
-#include <nark/util/linebuf.cpp>
+#define _CRT_SECURE_NO_WARNINGS
+#include <nark/util/linebuf.hpp>
 #include <nark/valvec.hpp>
 #include <getopt.h>
 
@@ -20,7 +21,8 @@ GetoptDone:
 	nark::valvec<std::string> F;
 	while (lb.getline(stdin) >= 0) {
 		lb.chomp();
-		lb.split_by_all(delims, &F);
+		lb.split_by_any(delims, &F);
+		printf("lb.size() = %d\n", (int)lb.size());
 		for (size_t i = 0; i < F.size(); ++i)
 			printf(":%s:\t", F[i].c_str());
 		printf("$\n");

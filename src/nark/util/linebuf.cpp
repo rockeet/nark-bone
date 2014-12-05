@@ -28,23 +28,35 @@ ptrdiff_t LineBuf::getline(FILE* f) {
 	if (NULL == p) {
 		capacity = BUFSIZ;
 		p = (char*)malloc(BUFSIZ);
+		if (NULL == p)
+		   	THROW_STD(runtime_error, "malloc(BUFSIZ=%d) failed", BUFSIZ);
 	}
-	char* ret = ::fgets(p, capacity, f);
-	if (ret) {
-		size_t len = ::strlen(p);
-		while (len == capacity-1 && p[len-1] == '\n') {
-			ret = (char*)realloc(p, capacity*2);
-			if (NULL == ret) {
-				throw std::bad_alloc();
+	n = 0;
+	p[0] = '\0';
+	for (;;) {
+		assert(n < capacity);
+		char*  ret = ::fgets(p + n, capacity - n, f);
+		size_t len = ::strlen(p + n);
+		if (0 == len && (feof(f) || ferror(f)))
+			return -1;
+		n += len;
+		if (ret) {
+			if (capacity-1 == n && p[n-1] != '\n') {
+				size_t newcap = capacity * 2;
+				ret = (char*)realloc(p, newcap);
+				if (NULL == ret)
+					THROW_STD(runtime_error, "realloc(newcap=%zd)", newcap);
+				p = ret;
+				capacity = newcap;
 			}
-			p = ret;
-			ret = ::fgets(p + len, capacity+1, f);
-			len = len + ::strlen(ret);
-			capacity *= 2;
+			else {
+				return ptrdiff_t(n);
+			}
 		}
-		return n = ptrdiff_t(len);
-	} else {
-		return -1;
+		else if (feof(f))
+			return ptrdiff_t(n);
+		else
+			return -1;
 	}
 #endif
 }
