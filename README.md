@@ -72,7 +72,7 @@ have self-references.
 <h3 id="lexical-cast">Lexical Cast</h3>
 Both compiling and running are much fast than `boost::lexical_cast`.
 ```c++
-#include <febird/lcast.hpp>
+#include <nark/lcast.hpp>
 
 //...
 	int    i = nark::lcast("123");
@@ -83,7 +83,7 @@ Both compiling and running are much fast than `boost::lexical_cast`.
 
 <h3 id="read-text-lines">Read text lines</h3>
 ```c++
-#include <febird/util/linebuf.hpp>
+#include <nark/util/linebuf.hpp>
 
 //...
 	nark::LineBuf line;
