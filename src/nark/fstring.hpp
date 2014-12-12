@@ -1,4 +1,4 @@
-#ifndef __nark_fstring_hpp__
+﻿#ifndef __nark_fstring_hpp__
 #define __nark_fstring_hpp__
 
 #include <assert.h>
@@ -9,15 +9,13 @@
 #include <string>
 //#include <iosfwd>
 #include <utility>
+#include <algorithm>
 
 #include "config.hpp"
 #include "stdtypes.hpp"
 #include "util/throw.hpp"
 #include "bits_rotate.hpp"
 
-#if defined(_MSC_VER)
-	#include <boost/algorithm/searching/boyer_moore_horspool.hpp>
-#endif
 //#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -91,28 +89,24 @@ inline size_t nark_fstrlen(const uint16_t* s) {
 	return n;
 }
 
+#ifdef _MSC_VER
+FEBIRD_DLL_EXPORT
+char*
+nark_fstrstr(const char* haystack, size_t haystack_len
+		   , const char* needle  , size_t needle_len);
+#else
 inline char*
 nark_fstrstr(const char* haystack, size_t haystack_len
-			 , const char* needle  , size_t needle_len)
+		   , const char* needle  , size_t needle_len)
 {
-#ifdef _MSC_VER
-	const char* hay_end = haystack + haystack_len;
-	const char* needle_end = needle + needle_len;
-	const char* q = boost::algorithm::boyer_moore_horspool_search(
-		haystack, hay_end, needle, needle_end);
-	if (q == needle_end)
-		return NULL;
-	else
-		return (char*)(q);
-#else
 	return (char*)memmem(haystack, haystack_len, needle, needle_len);
-#endif
 }
+#endif
 
 FEBIRD_DLL_EXPORT
 uint16_t*
 nark_fstrstr(const uint16_t* haystack, size_t haystack_len
-			 , const uint16_t* needle  , size_t needle_len);
+		   , const uint16_t* needle  , size_t needle_len);
 
 template<class Char>
 struct nark_get_uchar_type;
@@ -535,6 +529,9 @@ struct fstring_func {
 	typedef equal_unalign equal;
 #endif // SP_ALIGN
 };
+
+FEBIRD_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
+FEBIRD_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
 
 } // namespace nark
 
