@@ -4,7 +4,7 @@ nark-core
 Core utilities of nark library
 
 ## Prerequisite
-  * boost-1.41 or newer
+  * [boost-1.41 or newer](http://sourceforge.net/projects/boost/)
   * `nark-bone` use boost as header-only library
 
 ## Compile
