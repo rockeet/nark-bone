@@ -49,11 +49,26 @@
 
 #else
 
-#  define nark_no_return
+#if defined(_MSC_VER) && _MSC_VER >= 1310
+#  define nark_no_return __declspec(noreturn)
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#  define nark_no_alias __declspec(noalias)
+#endif
+
 #  define nark_likely(x)    x
 #  define nark_unlikely(x)  x
 #  define nark_warn_unused_result
 
+#endif
+
+#if !defined(nark_no_return)
+#  define nark_no_return
+#endif
+
+#if !defined(nark_no_alias)
+#  define nark_no_alias
 #endif
 
 /* The ISO C99 standard specifies that in C++ implementations these

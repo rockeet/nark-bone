@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 #ifndef __nark_pass_by_value_h__
 #define __nark_pass_by_value_h__
 

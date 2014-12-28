@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 #ifndef DataBuffer_h__
 #define DataBuffer_h__
 

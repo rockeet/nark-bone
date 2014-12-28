@@ -64,7 +64,7 @@ ptrdiff_t LineBuf::getline(FILE* f) {
 size_t LineBuf::trim() {
 	assert(NULL != p);
 	size_t n0 = n;
-	while (n > 0 && isspace(p[n-1])) p[--n] = 0;
+	while (n > 0 && isspace((unsigned char)p[n-1])) p[--n] = 0;
 	return n0 - n;
 }
 

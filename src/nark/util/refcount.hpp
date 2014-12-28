@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 #ifndef __nark_refcount_hpp__
 #define __nark_refcount_hpp__
 

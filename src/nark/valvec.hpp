@@ -476,7 +476,14 @@ public:
 		++n;
 	}
 
-	void push_back() { push_back(T()); }
+	void push_back() {
+		assert(n <= c);
+		if (n == c) {
+			ensure_capacity(n + 1);
+		}
+		new(p + n)T(); // copy cons
+		++n;
+	}
 	void push_back(const T& x) {
 		if (n < c) {
 			new(p+n)T(x); // copy cons
