@@ -10,6 +10,7 @@
 //#include <iosfwd>
 #include <utility>
 #include <algorithm>
+#include <string.h>
 
 #include "config.hpp"
 #include "stdtypes.hpp"
@@ -144,7 +145,8 @@ struct basic_fstring {
 
 	template<class CharVec>
 	basic_fstring(const CharVec& chvec, typename CharVec::const_iterator** =NULL) {
-		p = &chvec[0];
+		BOOST_STATIC_ASSERT(sizeof(*chvec.begin()) == sizeof(Char));
+		p = (const Char*)&*chvec.begin();
 		n = chvec.size();
 	#ifndef NDEBUG
 		if (chvec.size() > 1) {
@@ -197,7 +199,7 @@ struct basic_fstring {
 		}
 		if (len > size()) len = size(); // avoid pos+len overflow
 		if (pos + len > size()) len = size() - pos;
-	   	return basic_fstring(p+pos, p+pos+len);
+	   	return basic_fstring(p+pos, len);
    	}
 	basic_fstring substr(size_t pos) const {
 		assert(pos <= size());
@@ -206,6 +208,14 @@ struct basic_fstring {
 		}
 	   	return basic_fstring(p+pos, p+n);
    	}
+	basic_fstring substr_beg_end(size_t Beg, size_t End) const {
+		assert(Beg <= End);
+		assert(End <= size());
+		if (End > size()) { // similar with std::basic_string::substr
+			THROW_STD(out_of_range, "size()=%zd End=%zd", size(), End);
+		}
+	   	return basic_fstring(p+Beg, End-Beg);
+	}
 
 	bool match_at(ptrdiff_t pos, Char ch) const {
 		assert(pos >= 0);
