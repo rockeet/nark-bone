@@ -16,7 +16,7 @@
 #  if defined(FEBIRD_CREATE_DLL)
 #    pragma warning(disable: 4251)
 #    define FEBIRD_DLL_EXPORT __declspec(dllexport)      // creator of dll
-#    ifdef _DEBUG
+#    if defined(_DEBUG) || !defined(NDEBUG)
 #//	   pragma message("creating nark-d.lib")
 #    else
 #//	   pragma message("creating nark-r.lib")
@@ -24,7 +24,7 @@
 #  elif defined(FEBIRD_USE_DLL)
 #    pragma warning(disable: 4251)
 #    define FEBIRD_DLL_EXPORT __declspec(dllimport)      // user of dll
-#    ifdef _DEBUG
+#    if defined(_DEBUG) || !defined(NDEBUG)
 //#	   pragma comment(lib, "nark-d.lib")
 #    else
 //#	   pragma comment(lib, "nark-r.lib")
@@ -89,8 +89,10 @@
 	  defined(__x86_64) || defined(__x86_64__) ) || \
     defined(__WORD_SIZE) && __WORD_SIZE == 64
   #define FEBIRD_WORD_BITS 64
+  #define NARK_IF_WORD_BITS_64(Then, Else) Then
 #else
   #define FEBIRD_WORD_BITS 32
+  #define NARK_IF_WORD_BITS_64(Then, Else) Else
 #endif
 
 

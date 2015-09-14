@@ -16,43 +16,11 @@
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
 
-//
-#if defined(__GNUC__) && __GNUC__ >= 4 && !defined(__GXX_EXPERIMENTAL_CXX0X__)
-	#include <ext/memory> // for uninitialized_copy_n
-	#include <ext/algorithm> // for copy_n
-	#define STDEXT_copy_n               __gnu_cxx::copy_n
-	#define STDEXT_uninitialized_copy_n __gnu_cxx::uninitialized_copy_n
-#else
-	#define STDEXT_copy_n               std::copy_n
-	#define STDEXT_uninitialized_copy_n std::uninitialized_copy_n
-#endif
-
-#if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L || \
-	defined(_MSC_VER) && _MSC_VER >= 1700
-	#include <initializer_list>
-	#ifndef HSM_HAS_MOVE
-		#define HSM_HAS_MOVE
-	#endif
-#endif
-
-#ifndef __HAS_RVALUE_REFERENCE
-  #if (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 3) || \
-								       _MSC_VER >= 1600
-    #if __EDG_VERSION__ > 0
-      #define __HAS_RVALUE_REFERENCE (__EDG_VERSION__ >= 410)
-    #else
-      #define __HAS_RVALUE_REFERENCE 1
-    #endif
-  #elif __clang__
-    #define __HAS_RVALUE_REFERENCE __has_feature(cxx_rvalue_references)
-  #else
-    #define __HAS_RVALUE_REFERENCE 0
-  #endif
-#endif
+#include <nark/util/autofree.hpp>
 
 namespace nark {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_LIBCPP_VERSION)
 	template<class T>
 	void STDEXT_destroy_range_aux(T*, T*, boost::mpl::true_) {}
 	template<class T>
@@ -288,6 +256,12 @@ public:
         std::fill_n(p, n, x);
     }
 
+    void fill(size_t pos, size_t cnt, const T& x) {
+    	assert(pos <= n);
+    	assert(pos + cnt <= n);
+    	std::fill_n(p + pos, cnt, x);
+    }
+
     template<class AnyIter>
 	typename void_<typename AnyIter::iterator_category>::type
     assign(const std::pair<AnyIter, AnyIter>& rng) {
@@ -476,12 +450,26 @@ public:
 		++n;
 	}
 
+	template<class InputIter>
+	void insert(size_t pos, InputIter iter, size_t count) {
+		assert(pos <= n);
+		if (pos > n) {
+			throw std::out_of_range("valvec::insert");
+		}
+        if (n == c)
+            ensure_capacity(n+count);
+	//	for (ptrdiff_t i = n; i > pos; --i) memcpy(p+i, p+i-1, sizeof T);
+		memmove(p+pos+count, p+pos, sizeof(T)*(n-pos));
+		STDEXT_uninitialized_copy_n(iter, count, p+pos);
+		n += count;
+	}
+
 	void push_back() {
 		assert(n <= c);
 		if (n == c) {
 			ensure_capacity(n + 1);
 		}
-		new(p + n)T(); // copy cons
+		new(p + n)T(); // default cons
 		++n;
 	}
 	void push_back(const T& x) {
@@ -551,8 +539,13 @@ public:
 
 // use valvec as stack ...
 //
+	void pop_n(size_t num) {
+		assert(num <= this->n);
+		STDEXT_destroy_range(this->p + this->n - num, this->p + this->n);
+		this->n -= num;
+	}
     void pop() { pop_back(); }
-    void push() { push_back(T()); } // alias for push_back
+    void push() { push_back(); } // alias for push_back
     void push(const T& x) { push_back(x); } // alias for push_back
 
 	const T& top() const {
@@ -840,10 +833,12 @@ public:
 	void risk_set_size(size_t size) { this->n = size; }
 	void risk_set_capacity(size_t capa) { this->c = capa; }
 
-	void risk_release_ownership() {
+	T* risk_release_ownership() {
 	//	BOOST_STATIC_ASSERT(boost::has_trivial_destructor<T>::value);
+		T* q = p;
 		p = NULL;
 		n = c = 0;
+		return q;
 	}
 
 /*
@@ -1034,6 +1029,16 @@ template<class RanIt, class Key, class Comp>
 size_t lower_bound_0(RanIt a, size_t n, const Key& key, Comp comp) {
 	return lower_bound_n<RanIt, Key, Comp>(a, 0, n, key, comp);
 }
+template<class Container, class Key>
+size_t lower_bound_a(const Container& a, const Key& key) {
+	typedef typename Container::const_iterator RanIt;
+	return lower_bound_n<RanIt, Key>(a.begin(), 0, a.size(), key);
+}
+template<class Container, class Key, class Comp>
+size_t lower_bound_a(const Container& a, const Key& key, Comp comp) {
+	typedef typename Container::const_iterator RanIt;
+	return lower_bound_n<RanIt, Key, Comp>(a.begin(), 0, a.size(), key, comp);
+}
 
 template<class RanIt, class Key>
 size_t upper_bound_0(RanIt a, size_t n, const Key& key) {
@@ -1042,6 +1047,16 @@ size_t upper_bound_0(RanIt a, size_t n, const Key& key) {
 template<class RanIt, class Key, class Comp>
 size_t upper_bound_0(RanIt a, size_t n, const Key& key, Comp comp) {
 	return upper_bound_n<RanIt, Key, Comp>(a, 0, n, key, comp);
+}
+template<class Container, class Key>
+size_t upper_bound_a(const Container& a, const Key& key) {
+	typedef typename Container::const_iterator RanIt;
+	return upper_bound_n<RanIt, Key>(a.begin(), 0, a.size(), key);
+}
+template<class Container, class Key, class Comp>
+size_t upper_bound_a(const Container& a, const Key& key, Comp comp) {
+	typedef typename Container::const_iterator RanIt;
+	return upper_bound_n<RanIt, Key, Comp>(a.begin(), 0, a.size(), key, comp);
 }
 
 template<class RanIt, class Key>
@@ -1053,6 +1068,18 @@ template<class RanIt, class Key, class Comp>
 std::pair<size_t, size_t>
 equal_range_0(RanIt a, size_t n, const Key& key, Comp comp) {
 	return equal_range_n<RanIt, Key, Comp>(a, 0, n, key, comp);
+}
+template<class Container, class Key>
+std::pair<size_t, size_t>
+equal_range_a(const Container& a, const Key& key) {
+	typedef typename Container::const_iterator RanIt;
+	return equal_range_n<RanIt, Key>(a.begin(), 0, a.size(), key);
+}
+template<class Container, class Key, class Comp>
+std::pair<size_t, size_t>
+equal_range_a(const Container& a, const Key& key, Comp comp) {
+	typedef typename Container::const_iterator RanIt;
+	return equal_range_n<RanIt, Key, Comp>(a.begin(), 0, a.size(), key, comp);
 }
 
 template<class RanIt, class Key>

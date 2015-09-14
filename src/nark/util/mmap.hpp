@@ -6,8 +6,13 @@
 
 namespace nark {
 
-FEBIRD_DLL_EXPORT void  mmap_close(int fd, void* base);
-FEBIRD_DLL_EXPORT void* mmap_load(const char* fname, int* fd, size_t* base);
+FEBIRD_DLL_EXPORT void  mmap_close(void* base, size_t size);
+FEBIRD_DLL_EXPORT void* mmap_load(const char* fname, size_t* size);
+
+template<class String>
+void* mmap_load(const String& fname, size_t* size) {
+	return mmap_load(fname.c_str(), size);
+}
 
 } // namespace nark
 

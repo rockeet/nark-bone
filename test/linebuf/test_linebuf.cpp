@@ -9,6 +9,8 @@ int main(int argc, char* argv[]) {
 		int opt = getopt(argc, argv, "F:");
 		switch (opt) {
 			default:
+				break;
+			case -1:
 				goto GetoptDone;
 			case 'F':
 				delims = optarg;

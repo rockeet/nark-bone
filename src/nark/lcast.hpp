@@ -16,6 +16,9 @@ class FEBIRD_DLL_EXPORT lcast_from_str {
 	lcast_from_str& operator=(const lcast_from_str& y);
 
 public:
+	operator char() const;
+	operator signed char() const;
+	operator unsigned char() const;
 	operator short() const;
 	operator unsigned short() const;
 	operator int() const;
@@ -46,6 +49,9 @@ inline const lcast_from_str lcast(const char* s, size_t n) { return lcast_from_s
 inline const lcast_from_str lcast(const char* s, const char* t) { return lcast_from_str(s, t-s); }
 inline const lcast_from_str lcast(const char* s) { return lcast_from_str(s, strlen(s)); }
 
+FEBIRD_DLL_EXPORT std::string lcast(char x);
+FEBIRD_DLL_EXPORT std::string lcast(signed char x);
+FEBIRD_DLL_EXPORT std::string lcast(unsigned char x);
 FEBIRD_DLL_EXPORT std::string lcast(int x);
 FEBIRD_DLL_EXPORT std::string lcast(unsigned int x);
 FEBIRD_DLL_EXPORT std::string lcast(short x);
@@ -72,6 +78,9 @@ class FEBIRD_DLL_EXPORT hexlcast_from_str {
 	hexlcast_from_str& operator=(const hexlcast_from_str& y);
 
 public:
+	operator char() const;
+	operator signed char() const;
+	operator unsigned char() const;
 	operator short() const;
 	operator unsigned short() const;
 	operator int() const;
@@ -98,6 +107,9 @@ inline const hexlcast_from_str hexlcast(const char* s, size_t n) { return hexlca
 inline const hexlcast_from_str hexlcast(const char* s, const char* t) { return hexlcast_from_str(s, t-s); }
 inline const hexlcast_from_str hexlcast(const char* s) { return hexlcast_from_str(s, strlen(s)); }
 
+FEBIRD_DLL_EXPORT std::string hexlcast(char x);
+FEBIRD_DLL_EXPORT std::string hexlcast(signed char x);
+FEBIRD_DLL_EXPORT std::string hexlcast(unsigned char x);
 FEBIRD_DLL_EXPORT std::string hexlcast(int x);
 FEBIRD_DLL_EXPORT std::string hexlcast(unsigned int x);
 FEBIRD_DLL_EXPORT std::string hexlcast(short x);

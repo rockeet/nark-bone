@@ -40,7 +40,6 @@ struct FEBIRD_DLL_EXPORT LineBuf : boost::noncopyable {
 	/// split into fields
 	template<class Vec>
 	size_t split(const char* delims, Vec* F, size_t max_fields = ~size_t(0)) {
-		assert(n >= 0);
 		size_t dlen = strlen(delims);
 		if (0 == dlen) // empty delims redirect to blank delim
 			return split(' ', F);
@@ -61,7 +60,6 @@ struct FEBIRD_DLL_EXPORT LineBuf : boost::noncopyable {
 	}
 	template<class Vec>
 	size_t split_by_any(const char* delims, Vec* F, size_t max_fields = ~size_t(0)) {
-		assert(n >= 0);
 		size_t dlen = strlen(delims);
 		if (0 == dlen) // empty delims redirect to blank delim
 			return split(' ', F);
@@ -82,7 +80,6 @@ struct FEBIRD_DLL_EXPORT LineBuf : boost::noncopyable {
 	}
 	template<class Vec>
 	size_t split(const char delim, Vec* F, size_t max_fields = ~size_t(0)) {
-		assert(n >= 0);
 		F->resize(0);
 		if (' ' == delim) {
 		   	// same as awk, skip first blank field, and skip dup blanks

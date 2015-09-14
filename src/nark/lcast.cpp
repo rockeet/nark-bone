@@ -19,17 +19,44 @@
 
 namespace nark {
 
+lcast_from_str::operator char() const {
+	char* q;
+	long l = strtol(p, &q, 10);
+	if (q > p && l >= CHAR_MIN && l <= CHAR_MAX) {
+		return l;
+	}
+	throw std::invalid_argument("bad lcast string to char");
+}
+
+lcast_from_str::operator signed char() const {
+	char* q;
+	long l = strtol(p, &q, 10);
+	if (q > p && l >= SCHAR_MIN && l <= SCHAR_MAX) {
+		return l;
+	}
+	throw std::invalid_argument("bad lcast string to schar");
+}
+
+lcast_from_str::operator unsigned char() const {
+	char* q;
+	long l = strtol(p, &q, 10);
+	if (q > p && l >= 0 && l <= UCHAR_MAX) {
+		return l;
+	}
+	throw std::invalid_argument("bad lcast string to uchar");
+}
+
 lcast_from_str::operator short() const {
        	return atoi(p);
 }
 
 lcast_from_str::operator unsigned short() const {
 	char* q;
-	long l = strtoul(p, &q, 10);
-	if (q == p) {
-		throw std::invalid_argument("bad lcast");
+	long l = strtol(p, &q, 10);
+	if (q > p && l >= 0 && l <= USHRT_MAX) {
+		return (unsigned short)l;
 	}
-	return (unsigned short)l;
+	throw std::invalid_argument("bad lcast string to ushort");
 }
 
 lcast_from_str::operator int() const {
@@ -114,6 +141,9 @@ lcast_from_str::operator long double() const {
 	return buf; \
 }
 
+std::string lcast(char x) CONVERT("%d")
+std::string lcast(signed char x) CONVERT("%u")
+std::string lcast(unsigned char x) CONVERT("%u")
 std::string lcast(int x) CONVERT("%d")
 std::string lcast(unsigned int x) CONVERT("%u")
 std::string lcast(short x) CONVERT("%d")
@@ -130,6 +160,9 @@ std::string lcast(long double x) CONVERT("%Lf")
 //////////////////////////////////////////////////////////////////
 // Hex Lexical cast
 
+std::string hexlcast(char x) CONVERT("%X")
+std::string hexlcast(signed char x) CONVERT("%X")
+std::string hexlcast(unsigned char x) CONVERT("%X")
 std::string hexlcast(int x) CONVERT("%X")
 std::string hexlcast(unsigned int x) CONVERT("%X")
 std::string hexlcast(short x) CONVERT("%X")
@@ -181,6 +214,9 @@ hexlcast_from_str::operator Int() const { \
 	return hex_int_from_str<Int>(p, n); \
 }
 
+HEX_FROM_STR(char)
+HEX_FROM_STR(signed char)
+HEX_FROM_STR(unsigned char)
 HEX_FROM_STR(short)
 HEX_FROM_STR(unsigned short)
 HEX_FROM_STR(int)

@@ -12,7 +12,7 @@ namespace nark {
 
 	class FEBIRD_DLL_EXPORT profiling
 	{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 		long long m_freq;
 #endif
 
@@ -21,7 +21,7 @@ namespace nark {
 
 		long long now() const;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 		long long ns(long long x) const	{ return x * 1000 / (m_freq / 1000000); }
 		long long us(long long x) const	{ return x * 1000 / (m_freq / 1000); }
 		long long ms(long long x) const	{ return x * 1000 / (m_freq); }

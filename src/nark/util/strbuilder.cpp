@@ -11,7 +11,8 @@
 #include <nark/util/throw.hpp>
 
 namespace nark {
-#if defined(__GNUC__)
+#if defined(__GLIBC__) || defined(__CYGWIN__) || \
+	defined(__DARWIN_C_LEVEL) && defined(__DARWIN_C_FULL) && __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 	StrPrintf::StrPrintf(const char* format, ...) {
 		assert(NULL != format);
 		va_list  ap;
@@ -42,7 +43,9 @@ namespace nark {
 		assert(NULL != s);
 		return std::string(s, n);
 	}
+#endif
 
+#if defined(__GLIBC__) || defined(__CYGWIN__)
 	// StrBuilder
 
 	StrBuilder::StrBuilder() {

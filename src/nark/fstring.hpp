@@ -7,9 +7,10 @@
 
 #include <iterator>
 #include <string>
-//#include <iosfwd>
+#include <iosfwd>
 #include <utility>
 #include <algorithm>
+#include <string.h>
 
 #include "config.hpp"
 #include "stdtypes.hpp"
@@ -144,9 +145,10 @@ struct basic_fstring {
 
 	template<class CharVec>
 	basic_fstring(const CharVec& chvec, typename CharVec::const_iterator** =NULL) {
-		p = &chvec[0];
+		BOOST_STATIC_ASSERT(sizeof(*chvec.begin()) == sizeof(Char));
+		p = (const Char*)&*chvec.begin();
 		n = chvec.size();
-	#ifndef NDEBUG
+	#if !defined(NDEBUG) && 0
 		if (chvec.size() > 1) {
 		   	assert(&chvec[0]+1 == &chvec[1]);
 		   	assert(&chvec[0]+n-1 == &chvec[n-1]);
@@ -189,6 +191,8 @@ struct basic_fstring {
 	uc_t        uch(ptrdiff_t i)const{assert(i>=0);assert(i<n);assert(p);return p[i];}
 
 	bool empty() const { return 0 == n; }
+	void chomp();
+	void trim();
 
 	basic_fstring substr(size_t pos, size_t len) const {
 		assert(pos <= size());
@@ -197,7 +201,7 @@ struct basic_fstring {
 		}
 		if (len > size()) len = size(); // avoid pos+len overflow
 		if (pos + len > size()) len = size() - pos;
-	   	return basic_fstring(p+pos, p+pos+len);
+	   	return basic_fstring(p+pos, len);
    	}
 	basic_fstring substr(size_t pos) const {
 		assert(pos <= size());
@@ -206,6 +210,14 @@ struct basic_fstring {
 		}
 	   	return basic_fstring(p+pos, p+n);
    	}
+	basic_fstring substrBegEnd(size_t Beg, size_t End) const {
+		assert(Beg <= End);
+		assert(End <= size());
+		if (End > size()) { // similar with std::basic_string::substr
+			THROW_STD(out_of_range, "size()=%zd End=%zd", size(), End);
+		}
+	   	return basic_fstring(p+Beg, End-Beg);
+	}
 
 	bool match_at(ptrdiff_t pos, Char ch) const {
 		assert(pos >= 0);
@@ -231,15 +243,22 @@ struct basic_fstring {
 		return nark_fstrstr(p, n, needle.p, needle.n);
 	}
 
-	bool begin_with(basic_fstring x) const {
+	bool startsWith(basic_fstring x) const {
 		assert(x.n > 0);
 		if (x.n > n) return false;
 		return memcmp(p, x.p, sizeof(Char)*x.n) == 0;
 	}
-	bool end_with(basic_fstring x) const {
+	bool endsWith(basic_fstring x) const {
 		assert(x.n > 0);
 		if (x.n > n) return false;
 		return memcmp(p+n - x.n, x.p, sizeof(Char)*x.n) == 0;
+	}
+
+	size_t commonPrefixLen(basic_fstring y) const {
+		size_t minlen = n < y.n ? n : y.n;
+		for (size_t i = 0; i < minlen; ++i)
+			if (p[i] != y.p[i]) return i;
+		return minlen;
 	}
 
 	template<class Vec>
@@ -328,13 +347,7 @@ FEBIRD_DLL_EXPORT bool operator>(fstring x, fstring y);
 FEBIRD_DLL_EXPORT bool operator<=(fstring x, fstring y);
 FEBIRD_DLL_EXPORT bool operator>=(fstring x, fstring y);
 
-/*
-// ostream is brain dead binary incompatible, use inline
-inline std::ostream& operator<<(std::ostream& os, fstring s) {
-	os.write(s.p, s.n);
-	return os;
-}
-*/
+FEBIRD_DLL_EXPORT std::ostream& operator<<(std::ostream& os, fstring s);
 
 // fstring16
 FEBIRD_DLL_EXPORT bool operator==(fstring16 x, fstring16 y);

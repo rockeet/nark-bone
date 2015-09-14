@@ -1,5 +1,5 @@
 #include "fstring.hpp"
-//#include <ostream>
+#include <ostream>
 
 #if defined(_MSC_VER)
 #include <boost/algorithm/searching/boyer_moore_horspool.hpp>
@@ -29,6 +29,11 @@ bool operator<(fstring x, fstring y) {
 bool operator> (fstring x, fstring y) { return   y < x ; }
 bool operator<=(fstring x, fstring y) { return !(y < x); }
 bool operator>=(fstring x, fstring y) { return !(x < y); }
+
+std::ostream& operator<<(std::ostream& os, fstring x) {
+	os.write(x.data(), x.size());
+	return os;
+}
 
 // fstring16
 
@@ -145,6 +150,29 @@ unsigned char gtab_ascii_toupper[256] = {
 	0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
 	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF,
 };
+
+template<>
+void basic_fstring<char>::chomp() {
+	while (n && isspace((unsigned char)(p[n-1]))) n--;
+}
+template<>
+void basic_fstring<uint16_t>::chomp() {
+	while (n && iswspace(p[n-1])) n--;
+}
+
+template<>
+void basic_fstring<char>::trim() {
+	while (n && isspace((unsigned char)(p[n-1]))) n--;
+	while (n && isspace((unsigned char)(*p))) p++, n--;
+}
+template<>
+void basic_fstring<uint16_t>::trim() {
+	while (n && iswspace(p[n-1])) n--;
+	while (n && iswspace(*p)) p++, n--;
+}
+
+template struct basic_fstring<char>;
+template struct basic_fstring<uint16_t>;
 
 
 } // namespace nark

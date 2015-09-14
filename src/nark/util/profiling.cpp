@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 #  define WIN32_LEAN_AND_MEAN
 #  include <Windows.h>
 #else
@@ -15,7 +15,7 @@ namespace nark {
 
 	profiling::profiling()
 	{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
 		m_freq = li.QuadPart;
@@ -24,7 +24,7 @@ namespace nark {
 
 	long long profiling::now() const
 	{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 		LARGE_INTEGER li;
 		QueryPerformanceCounter(&li);
 		return li.QuadPart;
@@ -59,7 +59,7 @@ namespace nark {
 			perror("profiling::now.gettimeofday");
 			abort();
 		}
-		return (long long)tv.tv_sec * 1000000 + tv.tv_nsec;
+		return (long long)tv.tv_sec * 1000000000 + tv.tv_usec * 1000;
 #endif
 	}
 

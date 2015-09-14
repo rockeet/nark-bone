@@ -5,7 +5,8 @@
 
 namespace nark {
 
-#if defined(__GNUC__) || defined(__CYGWIN__)
+#if defined(__GLIBC__) || defined(__CYGWIN__) || \
+	defined(__DARWIN_C_LEVEL) && defined(__DARWIN_C_FULL) && __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 	// This class is more simple to use, but it should be used for one-time printf
 	// This class is about 50% faster than StrBuilder on one-time printf
 	class StrPrintf {
@@ -19,7 +20,11 @@ namespace nark {
 		~StrPrintf();
 		operator std::string() const;
 	};
+#else
+  #pragma message("StrPrintf is skiped because not in glibc")
+#endif
 
+#if defined(__GNUC__) || defined(__CYGWIN__)
 	// This class should be used for multiple-time append by printf
 	// This class is about 30% faster than StrPrintf on building big strings
 	// This class is about 50% slower than std::ostingstream on building big strings

@@ -19,6 +19,7 @@ struct default_offset_op {
 	void   set(Offset& x, size_t y) const { x = static_cast<Offset>(y); }
 	void   inc(Offset& x, ptrdiff_t d = 1) const { x += d; }
 	Offset make(size_t y) const { return Offset(y); }
+	static const Offset maxpool = Offset(-1);
 };
 
 // just allow operations at back
@@ -32,7 +33,7 @@ class basic_fstrvec : private OffsetOp {
 public:
 	valvec<Char>   strpool;
 	valvec<Offset> offsets;
-	static const size_t maxpool = Offset(-1);
+	static const size_t maxpool = OffsetOp::maxpool;
 
 	explicit basic_fstrvec(const OffsetOp& oop = OffsetOp())
 	  : OffsetOp(oop) {
@@ -69,6 +70,21 @@ public:
 		assert(range.first <= range.second);
 		assert(strpool.size() + (range.second - range.first) <= maxpool);
 		strpool.append(range.first, range.second);
+		offsets.push_back(OffsetOp::make(strpool.size()));
+	}
+	template<class String>
+	typename void_<typename String::iterator>::type
+   	push_back(const String& str, Char lastChar) {
+		assert(strpool.size() + str.size() <= maxpool);
+		strpool.append(str.begin(), str.end());
+		strpool.push_back(lastChar);
+		offsets.push_back(OffsetOp::make(strpool.size()));
+	}
+	void push_back(std::pair<const Char*, const Char*> range, Char lastChar) {
+		assert(range.first <= range.second);
+		assert(strpool.size() + (range.second - range.first) <= maxpool);
+		strpool.append(range.first, range.second);
+		strpool.push_back(lastChar);
 		offsets.push_back(OffsetOp::make(strpool.size()));
 	}
 	void emplace_back(const Char* str, size_t len) {
@@ -215,6 +231,19 @@ public:
 		return base + off1;
 	}
 
+	const Char* c_str(size_t idx) const {
+		assert(idx < offsets.size()-1);
+		const Char* base = strpool.data();
+		size_t off0 = OffsetOp::get(offsets[idx]);
+	#if !defined(NDEBUG)
+		size_t off1 = OffsetOp::get(offsets[idx+1]);
+		assert(off0 < off1);
+		assert(off1 <= strpool.size());
+	//	assert(off1 >= 1); // off0 < off1 implies this assert
+		assert('\0' == base[off1-1]);
+	#endif
+		return base + off0;
+	}
 	void shrink_to_fit() {
 		strpool.shrink_to_fit();
 		offsets.shrink_to_fit();
