@@ -135,7 +135,7 @@ struct basic_fstring {
 	basic_fstring(const Char* x, const Char* y) : p(x), n(y-x) { assert(y >= x); }
 
 #define fstring_enable_if_same_size(C) typename boost::enable_if_c<sizeof(C)==sizeof(Char)>::type* = NULL
-	template<class C> basic_fstring(const C* x, fstring_enable_if_same_size(C)) { assert(NULL != x); p = x; n = nark_fstrlen((const Char*)x); }
+	template<class C> basic_fstring(const C* x, fstring_enable_if_same_size(C)) { assert(NULL != x); p = (const Char*)x; n = nark_fstrlen((const Char*)x); }
 	template<class C> basic_fstring(const C* x, ptrdiff_t l, fstring_enable_if_same_size(C)) : p((const Char*)x), n(l  ) { assert(l >= 0); }
 	template<class C> basic_fstring(const C* x, const C*  y, fstring_enable_if_same_size(C)) : p((const Char*)x), n(y-x) { assert(y >= x); }
 #undef fstring_enable_if_same_size
@@ -196,26 +196,26 @@ struct basic_fstring {
 
 	basic_fstring substr(size_t pos, size_t len) const {
 		assert(pos <= size());
-		if (pos > size()) { // similar with std::basic_string::substr
-			THROW_STD(out_of_range, "size()=%zd pos=%zd", size(), pos);
-		}
-		if (len > size()) len = size(); // avoid pos+len overflow
+		assert(len <= size());
+	//	if (pos > size()) { // similar with std::basic_string::substr
+	//		THROW_STD(out_of_range, "size()=%zd pos=%zd", size(), pos);
+	//	}
 		if (pos + len > size()) len = size() - pos;
 	   	return basic_fstring(p+pos, len);
    	}
 	basic_fstring substr(size_t pos) const {
 		assert(pos <= size());
-		if (pos > size()) { // similar with std::basic_string::substr
-			THROW_STD(out_of_range, "size()=%zd pos=%zd", size(), pos);
-		}
-	   	return basic_fstring(p+pos, p+n);
+	//	if (pos > size()) { // similar with std::basic_string::substr
+	//		THROW_STD(out_of_range, "size()=%zd pos=%zd", size(), pos);
+	//	}
+	   	return basic_fstring(p+pos, n-pos);
    	}
 	basic_fstring substrBegEnd(size_t Beg, size_t End) const {
 		assert(Beg <= End);
 		assert(End <= size());
-		if (End > size()) { // similar with std::basic_string::substr
-			THROW_STD(out_of_range, "size()=%zd End=%zd", size(), End);
-		}
+	//	if (End > size()) { // similar with std::basic_string::substr
+	//		THROW_STD(out_of_range, "size()=%zd End=%zd", size(), End);
+	//	}
 	   	return basic_fstring(p+Beg, End-Beg);
 	}
 

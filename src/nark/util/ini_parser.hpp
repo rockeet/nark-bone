@@ -25,8 +25,6 @@
 
 namespace nark {
 
-class ini_parser_impl;
-
 class FEBIRD_DLL_EXPORT ini_parser
 {
 	ini_parser(const ini_parser&);
@@ -68,7 +66,12 @@ public:
 	}
 
 private:
-	std::auto_ptr<ini_parser_impl> m_parser;
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L || \
+	defined(_MSC_VER) && _MSC_VER >= 1700
+	std::unique_ptr<class ini_parser_impl> m_parser;
+#else
+	std::auto_ptr<class ini_parser_impl> m_parser;
+#endif
 	mutable std::string m_tmpcstr; //!< used for getcstr()
 };
 

@@ -13,6 +13,10 @@
 #define _CRT_NONSTDC_NO_WARNINGS
 #endif
 
+#ifndef _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
+#endif
+
 #  if defined(FEBIRD_CREATE_DLL)
 #    pragma warning(disable: 4251)
 #    define FEBIRD_DLL_EXPORT __declspec(dllexport)      // creator of dll

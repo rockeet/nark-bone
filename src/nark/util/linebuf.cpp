@@ -1,11 +1,21 @@
 #include "linebuf.hpp"
 #include "throw.hpp"
+#include "autoclose.hpp"
 
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdexcept>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace nark {
 
@@ -107,6 +117,34 @@ bool LineBuf::read_binary_tuple(int32_t* offsets, size_t arity, FILE* f) {
 	}
 	this->n = len;
 	return true; // len can be 0
+}
+
+void LineBuf::read_all(FILE* fp) {
+	int fd = fileno(fp);
+	struct stat st;
+	if (::fstat(fd, &st) < 0) {
+		THROW_STD(runtime_error, "fstat failed");
+	}
+	if (p) free(p);
+	p = (char*)malloc(st.st_size + 1);
+	if (NULL == p) {
+		n = 0;
+		capacity = 0;
+		THROW_STD(invalid_argument,
+			"file too large(size=%lld)", llong(st.st_size));
+	}
+	capacity = st.st_size + 1;
+	n = fread(p, 1, st.st_size, fp);
+	p[n] = '\0';
+}
+
+void LineBuf::read_all(const char* fname) {
+	Auto_fclose f(fopen(fname, "r"));
+	if (!f) {
+		THROW_STD(invalid_argument,
+			"ERROR: fopen(%s, r) = %s", fname, strerror(errno));
+	}
+	read_all(f);
 }
 
 } // namespace nark

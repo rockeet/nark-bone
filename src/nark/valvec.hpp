@@ -19,6 +19,35 @@
 #include <nark/util/autofree.hpp>
 
 namespace nark {
+#if (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L || \
+	 defined(_MSC_VER) && _MSC_VER >= 1700) && 0
+	template <typename T>
+	class is_iterator_impl {
+	  static char test(...);
+	  template <typename U,
+		typename=typename std::iterator_traits<U>::difference_type,
+		typename=typename std::iterator_traits<U>::pointer,
+		typename=typename std::iterator_traits<U>::reference,
+		typename=typename std::iterator_traits<U>::value_type,
+		typename=typename std::iterator_traits<U>::iterator_category
+	  > static long test(U*);
+	public:
+	  static const bool value = sizeof(test((T*)(NULL))) == sizeof(long);
+	};
+#else
+	template <typename T>
+	class is_iterator_impl {
+		static T makeT();
+		static char test(...); // Common case
+		template<class R> static typename R::iterator_category* test(R);
+		template<class R> static void* test(R*); // Pointer
+	public:
+		static const bool value = sizeof(test(makeT())) == sizeof(void*);
+	};
+#endif
+	template <typename T>
+	struct is_iterator :
+		public boost::mpl::bool_<is_iterator_impl<T>::value> {};
 
 #if defined(_MSC_VER) || defined(_LIBCPP_VERSION)
 	template<class T>
@@ -189,9 +218,8 @@ public:
 
 	template<class AnyIter>
 	valvec(const std::pair<AnyIter, AnyIter>& rng
-		, typename AnyIter::iterator_category tag
-		= typename AnyIter::iterator_category()) {
-		construct(rng.first, rng.second, tag);
+		 , typename boost::enable_if<is_iterator<AnyIter>,int>::type = 1) {
+		construct(rng.first, rng.second, typename std::iterator_traits<AnyIter>::iterator_category());
 	}
 	valvec(const std::pair<const T*, const T*>& rng) {
 		construct(rng.first, rng.second - rng.first);
@@ -200,14 +228,12 @@ public:
 	valvec(const T* first, ptrdiff_t len) { construct(first, len); }
 	template<class AnyIter>
 	valvec(AnyIter first, AnyIter last
-		, typename AnyIter::iterator_category tag
-		= typename AnyIter::iterator_category()) 	{
-		construct(first, last, tag);
+		, typename boost::enable_if<is_iterator<AnyIter>, int>::type = 1) {
+		construct(first, last, typename std::iterator_traits<AnyIter>::iterator_category());
 	}
 	template<class InputIter>
 	valvec(InputIter first, ptrdiff_t count
-		, typename InputIter::iterator_category
-		= typename InputIter::iterator_category()) 	{
+		, typename boost::enable_if<is_iterator<InputIter>, int>::type = 1) 	{
 		assert(count >= 0);
 		construct(first, count);
 	}
@@ -263,17 +289,17 @@ public:
     }
 
     template<class AnyIter>
-	typename void_<typename AnyIter::iterator_category>::type
+	typename boost::enable_if<is_iterator<AnyIter>, void>::type
     assign(const std::pair<AnyIter, AnyIter>& rng) {
-		assign_aux(rng.first, rng.second, typename AnyIter::iterator_category());
+		assign_aux(rng.first, rng.second, typename std::iterator_traits<AnyIter>::iterator_category());
     }
     template<class AnyIter>
-	typename void_<typename AnyIter::iterator_category>::type
+	typename boost::enable_if<is_iterator<AnyIter>, void>::type
     assign(AnyIter first, AnyIter last) {
 		assign_aux(first, last, typename AnyIter::iterator_category());
     }
     template<class InputIter>
-	typename void_<typename InputIter::iterator_category>::type
+	typename boost::enable_if<is_iterator<InputIter>, void>::type
     assign(InputIter first, ptrdiff_t len) {
 		assert(len >= 0);
 		erase_all();
@@ -410,7 +436,8 @@ public:
 	}
 
 	void erase_all() {
-		STDEXT_destroy_range(p, p + n);
+		if (!boost::has_trivial_destructor<T>::value)
+			STDEXT_destroy_range(p, p + n);
 		n = 0;
 	}
 
@@ -519,20 +546,28 @@ public:
 	append(const Container& cont) {
 		append(cont.begin(), cont.end());
 	}
+
+	T* grow_no_init(size_t cnt) {
+		size_t oldsize = n;
+		resize_no_init(n + cnt);
+		return p + oldsize;
+	}
+
+	T* grow(size_t cnt) {
+		size_t oldsize = n;
+		resize(n + cnt);
+		return p + oldsize;
+	}
+
     void unchecked_push_back() { unchecked_push_back(T()); }
     void unchecked_push_back(const T& x) {
 		assert(n < c);
         new(p+n)T(x); // copy cons
         ++n;
     }
+
     void pop_back() {
-        if (0 == n)
-            throw std::logic_error("valvec::pop_back(), already empty");
-        p[n-1].~T();
-        --n;
-    }
-    void unchecked_pop_back() {
-        assert(n > 0);
+		assert(n > 0);
         p[n-1].~T();
         --n;
     }
@@ -560,18 +595,6 @@ public:
 	}
 
 	T pop_val() {
-        if (0 == n)
-            throw std::logic_error("valvec::pop_val(), valec is empty");
-#ifdef HSM_HAS_MOVE
-		T x(std::move(p[n-1]));
-#else
-		T x(p[n-1]);
-        p[n-1].~T();
-#endif
-		--n;
-		return x;
-	}
-	T unchecked_pop_val() {
 		assert(n > 0);
 #ifdef HSM_HAS_MOVE
 		T x(std::move(p[n-1]));
@@ -583,7 +606,6 @@ public:
 		return x;
 	}
 
-    void unchecked_pop() { unchecked_pop_back(); }
     void unchecked_push() { unchecked_push_back(T()); }
     void unchecked_push(const T& x) { unchecked_push_back(x); }
 
@@ -696,6 +718,9 @@ public:
         ++n;
     }
 
+	// same as push_back()
+	void emplace_back() { push_back(); }
+
 #if defined(_MSC_VER) && _MSC_VER <= 1800
 // C++: internal compiler error: variadic perfect forwarding
 // https://connect.microsoft.com/VisualStudio/feedback/details/806017/c-internal-compiler-error-variadic-perfect-forwarding-to-base-class
@@ -722,6 +747,12 @@ public:
 		T val(std::forward<Args>(args)...);
         ensure_capacity(n+1);
 		new(p+n)T(std::move(val));
+		++n;
+	}
+	template<class... Args>
+	void unchecked_emplace_back(Args&&... args) {
+		assert(n < c);
+		new(p+n)T(std::forward<Args>(args)...);
 		++n;
 	}
 #endif
@@ -795,6 +826,31 @@ public:
 		T val(a1, a2, a3, a4);
         ensure_capacity(n+1);
 		new(p+n)T(val);
+		++n;
+	}
+
+	template<class A1>
+	void unchecked_emplace_back(const A1& a1) {
+		assert(n < c);
+		new(p+n)T(a1);
+		++n;
+	}
+	template<class A1, class A2>
+	void unchecked_emplace_back(const A1& a1, const A2& a2) {
+		assert(n < c);
+		new(p+n)T(a1, a2);
+		++n;
+	}
+	template<class A1, class A2, class A3>
+	void unchecked_emplace_back(const A1& a1, const A2& a2, const A3& a3) {
+		assert(n < c);
+		new(p+n)T(a1, a2, a3);
+		++n;
+	}
+	template<class A1, class A2, class A3, class A4>
+	void unchecked_emplace_back(const A1& a1, const A2& a2, const A3& a3, const A4& a4) {
+		assert(n < c);
+		new(p+n)T(a1, a2, a3, a4);
 		++n;
 	}
 

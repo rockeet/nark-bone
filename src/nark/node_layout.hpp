@@ -25,7 +25,9 @@
 	#include <boost/swap.hpp>
 #endif
 
-#if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L || \
+	defined(_MSC_VER) && _MSC_VER >= 1700
+	#include <initializer_list>
 	#ifndef HSM_HAS_MOVE
 		#define HSM_HAS_MOVE
 	#endif

@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 //#include "stdafx.h"
 #include "ini_parser.hpp"
 #include "autoclose.hpp"

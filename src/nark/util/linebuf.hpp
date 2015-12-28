@@ -112,6 +112,9 @@ struct FEBIRD_DLL_EXPORT LineBuf : boost::noncopyable {
 	/// @params[out] offsets: length of offsets must >= arity+1
 	///  on return, offsets[arity] saves tuple data length
 	bool read_binary_tuple(int32_t* offsets, size_t arity, FILE* f);
+
+	void read_all(FILE*);
+	void read_all(const char* fname);
 };
 
 } // namespace nark

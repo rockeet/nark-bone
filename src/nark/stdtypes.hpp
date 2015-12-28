@@ -49,7 +49,15 @@
 
 namespace nark {
 
-typedef unsigned char byte;
+typedef unsigned char   byte_t;
+typedef unsigned char   byte;
+typedef   signed char  sbyte_t;
+typedef   signed char  sbyte;
+typedef unsigned short ushort;
+typedef unsigned int   uint;
+typedef unsigned long  ulong;
+typedef unsigned long long ullong;
+typedef long long llong;
 
 #if !defined(BOOST_NO_INT64_T)
 typedef uint64_t stream_position_t;
@@ -141,38 +149,38 @@ private:											\
 } // namespace nark
 
 template<class T>
-inline T aligned_load(const unsigned char* p) {
+inline T aligned_load(const void* p) {
    	return *reinterpret_cast<const T*>(p);
 }
 template<class T>
-inline T unaligned_load(const unsigned char* p) {
+inline T unaligned_load(const void* p) {
    	T x;
    	memcpy(&x, p, sizeof(T));
    	return x;
 }
 template<class T>
-inline T aligned_load(const unsigned char* p, size_t i) {
+inline T aligned_load(const void* p, size_t i) {
    	return reinterpret_cast<const T*>(p)[i];
 }
 template<class T>
-inline T unaligned_load(const unsigned char* p, size_t i) {
+inline T unaligned_load(const void* p, size_t i) {
    	T x;
-   	memcpy(&x, p + sizeof(T) * i, sizeof(T));
+   	memcpy(&x, (const char*)(p) + sizeof(T) * i, sizeof(T));
    	return x;
 }
 
 template<class T>
-inline void   aligned_save(unsigned char* p,T x){*reinterpret_cast<T*>(p)=x;}
+inline void   aligned_save(void* p,T x) { *reinterpret_cast<T*>(p) = x; }
 template<class T>
-inline void unaligned_save(unsigned char* p,T x){memcpy(p, &x, sizeof(T));}
+inline void unaligned_save(void* p,T x) { memcpy(p, &x, sizeof(T)); }
 
 template<class T>
-inline void aligned_save(unsigned char* p, size_t i, T val) {
+inline void aligned_save(void* p, size_t i, T val) {
    	reinterpret_cast<T*>(p)[i] = val;
 }
 template<class T>
-inline void unaligned_save(unsigned char* p, size_t i, T val) {
-   	memcpy(p + sizeof(T) * i, &val, sizeof(T));
+inline void unaligned_save(void* p, size_t i, T val) {
+   	memcpy((char*)(p) + sizeof(T) * i, &val, sizeof(T));
 }
 
 #endif // __nark_stdtypes_h__

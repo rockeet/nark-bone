@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
+#include <assert.h>
 #include <stdlib.h>
 #include <stdexcept>
 #include <memory>
@@ -78,9 +79,36 @@ namespace nark {
 				p = NULL;
 				return;
 			}
-			AutoFree tmp(n);
-			STDEXT_uninitialized_copy_n(src, n, tmp.p);
-			p = tmp.release();
+			if (boost::is_same<T, U>::value) {
+				p = (T*)::malloc(sizeof(T) * n);
+				if (NULL == p)
+					throw std::bad_alloc();
+				memcpy(p, src, sizeof(T) * n);
+			}
+			else {
+				AutoFree tmp(n);
+				STDEXT_uninitialized_copy_n(src, n, tmp.p);
+				p = tmp.release();
+			}
+		}
+		template<class U>
+		AutoFree(size_t n, size_t cap, const U* src) {
+			assert(n <= cap);
+			if (0 == cap) {
+				p = NULL;
+				return;
+			}
+			if (boost::is_same<T, U>::value) {
+				p = (T*)::malloc(sizeof(T) * cap);
+				if (NULL == p)
+					throw std::bad_alloc();
+				memcpy(p, src, sizeof(T) * n);
+			}
+			else {
+				AutoFree tmp(cap);
+				STDEXT_uninitialized_copy_n(src, n, tmp.p);
+				p = tmp.release();
+			}
 		}
 		~AutoFree() { if (p) ::free(p); }
 

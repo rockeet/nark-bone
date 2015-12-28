@@ -156,6 +156,10 @@ public:
 	   	return (*this)[offsets.size()-2];
 	}
 
+	size_t used_mem_size() const { return offsets.used_mem_size() + strpool.used_mem_size(); }
+	size_t full_mem_size() const { return offsets.full_mem_size() + strpool.full_mem_size(); }
+	size_t free_mem_size() const { return offsets.free_mem_size() + strpool.free_mem_size(); }
+
 	size_t size() const { return offsets.size() - 1; }
 	bool  empty() const { return offsets.size() < 2; }
 

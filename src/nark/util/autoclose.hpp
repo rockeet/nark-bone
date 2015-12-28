@@ -23,6 +23,7 @@ public:
 #endif
 	operator FILE*() const { return f; }
 	bool operator!() const { return NULL == f; }
+	FILE* operator->() const { return f; } // feof(fp) maybe a macro
 	explicit Auto_fclose(FILE* fp = NULL) { f = fp; }
 	~Auto_fclose() { if (NULL != f) ::fclose(f); }
 	void operator=(FILE* f0) { f = f0; } // disable chained assign
