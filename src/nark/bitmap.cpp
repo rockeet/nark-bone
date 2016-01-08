@@ -223,7 +223,8 @@ bool febitvec::isall1() const {
 	}
 }
 size_t febitvec::popcnt() const {
-	assert(m_size > 0);
+	if (0 == m_size)
+		return 0;
 	size_t pc = 0;
 	size_t n = m_size / WordBits;
 	for (size_t i = 0; i < n; ++i)

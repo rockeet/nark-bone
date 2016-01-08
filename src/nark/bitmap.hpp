@@ -307,6 +307,10 @@ public:
         assert(i < m_size);
 		return !nark_bit_test(m_words, i);
     }
+	bool back() const {
+		assert(m_size > 0);
+		return nark_bit_test(m_words, m_size-1);
+	}
 	void set(size_t i, bool val) {
         assert(i < m_size);
 		val ? set1(i) : set0(i);

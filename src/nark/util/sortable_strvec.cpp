@@ -216,10 +216,12 @@ void SortableStrVec::compress_strpool_level_1() {
 		}
 	}
 	assert(offset <= strpool.size());
+#if 0
 	if (offset < strpool.size()) {
 		long oldsize = strpool.size(), newsize = offset;
-	//	fprintf(stderr, "dedup: oldsize=%ld newsize=%ld\n", oldsize, newsize);
+		fprintf(stderr, "dedup: oldsize=%ld newsize=%ld\n", oldsize, newsize);
 	}
+#endif
 	strpool.risk_set_size(offset + 3);
 	strpool.fill(offset, 3, 0);
 	strpool.shrink_to_fit();
