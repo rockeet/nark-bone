@@ -154,7 +154,7 @@ void SortableStrVec::compact() {
 	for(size_t i = 0; i < m_index.size(); ++i) {
 		SEntry s = m_index[i];
 		memcpyForward(base + offset, base + s.offset, s.length);
-		m_index[i].offset = uint32_t(offset);
+		m_index[i].offset = offset;
 		offset += s.length;
 	}
 	assert(offset <= m_strpool.size());
@@ -218,7 +218,7 @@ void SortableStrVec::compress_strpool_level_1() {
 	assert(offset <= strpool.size());
 	if (offset < strpool.size()) {
 		long oldsize = strpool.size(), newsize = offset;
-		fprintf(stderr, "dedup: oldsize=%ld newsize=%ld\n", oldsize, newsize);
+	//	fprintf(stderr, "dedup: oldsize=%ld newsize=%ld\n", oldsize, newsize);
 	}
 	strpool.risk_set_size(offset + 3);
 	strpool.fill(offset, 3, 0);
