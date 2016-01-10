@@ -109,9 +109,6 @@ LIBS += -L/usr/lib64 -L/usr/lib
 
 extf = -pie -fno-stack-protector
 #extf+=-fno-stack-protector-all
-ifeq "${RE2_CXX}" ""
-  RE2_CXX := ${CXX}
-endif
 override CFLAGS += ${extf}
 #override CFLAGS += -g3
 override CXXFLAGS += ${extf}
@@ -128,6 +125,7 @@ endif
 
 bone_src := \
    $(wildcard src/nark/*.cpp) \
+   $(wildcard src/nark/thread/*.cpp) \
    $(wildcard src/nark/util/*.cpp)
 
 #function definition
