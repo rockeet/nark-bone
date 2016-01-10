@@ -125,8 +125,11 @@ endif
 
 bone_src := \
    $(wildcard src/nark/*.cpp) \
-   $(wildcard src/nark/thread/*.cpp) \
    $(wildcard src/nark/util/*.cpp)
+
+ifeq (${WITH_THREAD},1)
+bone_src += $(wildcard src/nark/thread/*.cpp)
+endif
 
 #function definition
 #@param:${1} -- targets var prefix, such as bdb_util | bone
