@@ -173,17 +173,17 @@ public:
     const T* begin() const { return p; }
     const T* end()   const { return p + n; }
 
-    T* rbegin() { return p + n; }
-    T* rend()   { return p; }
+    reverse_iterator rbegin() { return reverse_iterator(p + n); }
+    reverse_iterator rend()   { return reverse_iterator(p); }
 
-    const T* rbegin() const { return p + n; }
-    const T* rend()   const { return p; }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(p + n); }
+    const_reverse_iterator rend()   const { return const_reverse_iterator(p); }
 
     const T* cbegin() const { return p; }
     const T* cend()   const { return p + n; }
 
-    const T* crbegin() const { return p + n; }
-    const T* crend()   const { return p; }
+    const_reverse_iterator crbegin() const { return const_reverse_iterator(p + n); }
+    const_reverse_iterator crend()   const { return const_reverse_iterator(p); }
 
     valvec() {
         p = NULL;
@@ -456,6 +456,16 @@ public:
 		assert(from <= p + n);
 		STDEXT_destroy_range(from, p + n);
 		n = from - p;
+	}
+
+	/// trim [from, size)
+	/// @param from is the new size
+	/// when trim(0) is ambiguous, use vec.erase_all(), or:
+	/// vec.trim(size_t(0));
+	void trim(size_t from) {
+		assert(from <= n);
+		STDEXT_destroy_range(p + from, p + n);
+		n = from;
 	}
 
 	void insert(const T* pos, const T& x) {

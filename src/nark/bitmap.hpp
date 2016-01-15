@@ -267,9 +267,14 @@ public:
 	febitvec& operator=(febitvec&&); // move-assign
 #endif
 
-	febitvec(const febitvec& y, size_t beg, size_t end);
+	febitvec(const febitvec& y, size_t beg, size_t len);
 
 	~febitvec();
+
+	void append(const febitvec& y);
+	void append(const febitvec& y, size_t beg, size_t len);
+	void copy(size_t destBeg, const febitvec& y);
+	void copy(size_t destBeg, const febitvec& y, size_t srcBeg, size_t len);
 
 	void clear();
 	void erase_all();
@@ -293,6 +298,11 @@ public:
 			this->set(m_size++, val);
 		else
 			push_back_slow_path(val);
+	}
+
+	void unchecked_push_back(bool val) {
+		assert(m_size < m_capacity);
+		this->set(m_size++, val);
 	}
 
     bool operator[](size_t i) const { // alias of 'is1'

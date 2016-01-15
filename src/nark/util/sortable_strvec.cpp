@@ -557,6 +557,13 @@ size_t SortableStrVec::upper_bound_at_pos(size_t lo, size_t hi, size_t pos) cons
 	return lo;
 }
 
+size_t SortableStrVec::lower_bound(fstring key) const {
+	return lower_bound_0<const SortableStrVec&>(*this, m_index.size(), key);
+}
+
+size_t SortableStrVec::upper_bound(fstring key) const {
+	return upper_bound_0<const SortableStrVec&>(*this, m_index.size(), key);
+}
 
 } // namespace nark
 

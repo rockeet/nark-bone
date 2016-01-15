@@ -16,7 +16,7 @@ public:
 		uint32_t seq_id;
 		size_t endpos() const { return offset + length; }
 	};
-	const size_t MAX_STR_POOL = (size_t(1) << 40) - 1; // 1T-1
+	static const size_t MAX_STR_POOL = (size_t(1) << 40) - 1; // 1T-1
 #else
 	struct SEntry {
 		uint32_t offset;
@@ -43,6 +43,7 @@ public:
 	byte_t* nth_data(size_t idx) const { return m_index[idx].offset + m_strpool.data(); }
 	size_t  nth_size(size_t idx) const { return m_index[idx].length; }
 	size_t  nth_offset(size_t idx) const { return m_index[idx].offset; }
+	fstring back() const { return (*this)[m_index.size()-1]; }
 	void swap(SortableStrVec&);
 	void push_back(fstring str);
 	void pop_back();
@@ -60,6 +61,8 @@ public:
 	size_t upper_bound_by_offset(size_t offset) const;
 	size_t lower_bound_at_pos(size_t lo, size_t hi, size_t pos) const;
 	size_t upper_bound_at_pos(size_t lo, size_t hi, size_t pos) const;
+	size_t lower_bound(fstring) const;
+	size_t upper_bound(fstring) const;
 private:
 	void compress_strpool_level_1();
 	void compress_strpool_level_2();

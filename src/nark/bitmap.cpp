@@ -73,16 +73,22 @@ febitvec& febitvec::operator=(febitvec&& y) {
 }
 #endif
 
-febitvec::febitvec(const febitvec& y, size_t beg, size_t end) {
-	assert(beg <= end);
-	assert(end <= y.size());
-	if (beg == end) {
+
+febitvec::febitvec(const febitvec& y, size_t beg, size_t len) {
+	assert(beg <= y.m_size);
+	assert(beg + len <= y.m_size);
+	if (beg + len > y.m_size) {
+		THROW_STD(out_of_range
+			, "beg = %zd, len = %zd, beg+len = %zd, y.size = %zd"
+			, beg, len, beg+len, y.m_size);
+	}
+	if (0 == len) {
 		new(this)febitvec();
 		return;
 	}
-	m_size = end - beg;
+	m_size = len;
 	size_t begBlock = beg / WordBits;
-	size_t endBlock = (end + WordBits - 1) / WordBits;
+	size_t endBlock = (beg + len + WordBits - 1) / WordBits;
 	size_t numBlock = endBlock - begBlock;
 	m_capacity = (WordBits*numBlock + AllocUnitBits-1) & ~(AllocUnitBits-1);
 	size_t capBlock = m_capacity / WordBits;
@@ -101,6 +107,30 @@ febitvec::febitvec(const febitvec& y, size_t beg, size_t end) {
 febitvec::~febitvec() {
 	if (m_words)
 		::free(m_words);
+}
+
+void febitvec::append(const febitvec& y) {
+//	resize_no_init(m_size + y.size());
+// TODO: improve performance
+	for (size_t i = 0, n = y.m_size; i < n; ++i)
+		this->push_back(y[i]);
+}
+
+void febitvec::append(const febitvec& y, size_t beg, size_t len) {
+// TODO: improve performance
+	assert(beg + len <= y.m_size);
+	for (size_t i = beg, end = beg + len; i < end; ++i)
+		this->push_back(y[i]);
+}
+
+void febitvec::copy(size_t destBeg, const febitvec& y) {
+	// TODO:
+	THROW_STD(invalid_argument, "Not implemeted");
+}
+
+void febitvec::copy(size_t destBeg, const febitvec& y, size_t srcBeg, size_t len) {
+	// TODO:
+	THROW_STD(invalid_argument, "Not implemeted");
 }
 
 void febitvec::clear() {
