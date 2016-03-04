@@ -100,7 +100,7 @@ namespace nark {
     v = (v & 0x33333333) + ((v >> 2) & 0x33333333); // temp
     return (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
   }
-  #if FEBIRD_WORD_BITS == 64
+  #if NARK_WORD_BITS == 64
     inline long long fast_popcount64(unsigned long long v) {
       v = v - ((v >> 1) & 0x5555555555555555ull);
       v = (v & 0x3333333333333333ull) + ((v >> 2) & 0x3333333333333333ull);
@@ -115,7 +115,7 @@ namespace nark {
   #endif
 #endif // select best popcount implementations
 
-#if FEBIRD_WORD_BITS >= 64
+#if NARK_WORD_BITS >= 64
   #if defined(__INTEL_COMPILER) && !defined(_MSC_VER)
 	inline unsigned nark_bsr_u64(unsigned __int64 i) {
 		unsigned j;
@@ -154,7 +154,7 @@ namespace nark {
 // cygwin gcc bittest has problems
 // other gcc has no bittest
 //  #define NARK_BIT_TEST_USE_INTRINSIC
-    #if FEBIRD_WORD_BITS == 64
+    #if NARK_WORD_BITS == 64
 	  BOOST_STATIC_ASSERT(sizeof(long) == 8); // LP model
 	  inline bool nark_bit_test(const long* a, long i) { return _bittest64(reinterpret_cast<const __int64*>(a), i) ? 1 : 0; }
 	  inline bool nark_bit_test(const long long* a, long i) { return _bittest64(reinterpret_cast<const __int64*>(a), i) ? 1 : 0; }
@@ -180,7 +180,7 @@ namespace nark {
     #endif
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
     #define NARK_BIT_TEST_USE_INTRINSIC
-    #if FEBIRD_WORD_BITS == 64
+    #if NARK_WORD_BITS == 64
 	  inline bool nark_bit_test(const __int64* a, __int64 i) { return _bittest64(a, i) ? 1 : 0; }
 	  inline bool nark_bit_test(const unsigned __int64* a, __int64 i) { return _bittest64(reinterpret_cast<const __int64*>(a), i) ? 1 : 0; }
 	  inline void nark_bit_set0(__int64* a, __int64 i) { _bittestandreset64(a, i); }
@@ -229,7 +229,7 @@ inline int fast_popcount_trail(unsigned int x, int n) { return fast_popcount32(_
 inline int fast_popcount_trail(unsigned int x, int n) { return fast_popcount32(x & ~(-1 << n)); }
 #endif
 
-#if defined(__BMI2__) && FEBIRD_WORD_BITS >= 64
+#if defined(__BMI2__) && NARK_WORD_BITS >= 64
 inline long long fast_popcount_trail(unsigned long long x, int n) { return fast_popcount64(_bzhi_u64(x, n)); }
 #else
 inline NARK_IF_WORD_BITS_64(long long, int)

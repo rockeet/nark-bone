@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 #ifndef __nark_compare_hpp__
 #define __nark_compare_hpp__
 
@@ -144,7 +144,7 @@ struct MemberExtractor
 	const ChainedPtr& deref(const ChainedPtr& x) const { return deref(*x); }
 	const Class& deref(const Class& x) const { return  x; }
 };
-#define FEBIRD_MemberExtractor(Class,MemberType,MemberName) \
+#define NARK_MemberExtractor(Class,MemberType,MemberName) \
 	nark::MemberExtractor<Class, MemberType, &Class::MemberName>()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -168,7 +168,7 @@ public:
 		return *(Member*)((char*)(&x) + m_offset);
 	}
 };
-#define FEBIRD_OffsetExtractor(Class,MemberType,MemberName) \
+#define NARK_OffsetExtractor(Class,MemberType,MemberName) \
 	nark::OffsetExtractor<Class, MemberType>(offsetof(Class, MemberName))
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

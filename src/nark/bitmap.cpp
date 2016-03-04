@@ -123,6 +123,16 @@ void febitvec::append(const febitvec& y, size_t beg, size_t len) {
 		this->push_back(y[i]);
 }
 
+void febitvec::assign(const febitvec& y) {
+	*this = y;
+}
+
+void febitvec::risk_memcpy(const febitvec& y) {
+	assert(m_size == y.m_size);
+	size_t numWords = (m_size + WordBits-1) / WordBits;
+	memcpy(m_words, y.m_words, sizeof(bm_uint_t) * numWords);
+}
+
 void febitvec::copy(size_t destBeg, const febitvec& y) {
 	// TODO:
 	THROW_STD(invalid_argument, "Not implemeted");
@@ -143,6 +153,10 @@ void febitvec::erase_all() {
 }
 void febitvec::fill(bool val) {
 	std::fill_n(m_words, num_words(), bm_uint_t(val ? -1 : 0));
+}
+
+void febitvec::grow(size_t cnt, bool val) {
+	resize(m_size + cnt, val);
 }
 
 void febitvec::reserve(size_t newcap) {

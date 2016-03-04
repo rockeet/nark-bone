@@ -11,7 +11,7 @@
 
 namespace nark {
 
-struct FEBIRD_DLL_EXPORT LineBuf : boost::noncopyable {
+struct NARK_DLL_EXPORT LineBuf : boost::noncopyable {
 	size_t capacity;
 	size_t n;
 	char*  p;

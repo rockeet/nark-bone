@@ -70,7 +70,7 @@ bool operator>=(fstring16 x, fstring16 y) { return !(x < y); }
 
 
 #ifdef _MSC_VER
-FEBIRD_DLL_EXPORT
+NARK_DLL_EXPORT
 char*
 nark_fstrstr(const char* haystack, size_t haystack_len
 			 , const char* needle, size_t needle_len)

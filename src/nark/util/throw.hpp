@@ -7,7 +7,7 @@
 #include <errno.h>
 
 #ifdef _MSC_VER
-#define FEBIRD_THROW(Except, fmt, ...) \
+#define NARK_THROW(Except, fmt, ...) \
 	do { \
 		char __buf[4096]; \
 		int __len = _snprintf(__buf, sizeof(__buf), \
@@ -20,7 +20,7 @@
 	} while (0)
 
 #else
-#define FEBIRD_THROW(Except, fmt, ...) \
+#define NARK_THROW(Except, fmt, ...) \
 	do { \
 		nark::AutoFree<char> __msg; \
 		int __len = asprintf(&__msg.p, "%s:%d: %s: " fmt, \
@@ -33,7 +33,7 @@
 #endif
 
 #define THROW_STD(Except, fmt, ...) \
-	FEBIRD_THROW(std::Except, fmt, ##__VA_ARGS__)
+	NARK_THROW(std::Except, fmt, ##__VA_ARGS__)
 
 #endif // __nark_util_throw_hpp__
 

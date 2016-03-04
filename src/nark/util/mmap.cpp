@@ -30,26 +30,31 @@ void mmap_close(void* base, size_t size) {
 #endif
 }
 
-void* mmap_load(const char* fname, size_t* fsize, bool writable) {
-	int openFlags = writable ? O_RDWR : O_RDONLY;
-	int fd = ::open(fname, openFlags);
-	if (fd < 0) {
-		int err = errno;
-		THROW_STD(logic_error, "open(fname=%s, %s) = %d(%X): %s"
-			, fname, writable ? "O_RDWR" : "O_RDONLY"
-			, err, err, strerror(err));
-	}
+void*
+mmap_load(const char* fname, size_t* fsize, bool writable, bool populate) {
 #ifdef _MSC_VER
 	LARGE_INTEGER lsize;
-	HANDLE hFile = (HANDLE)_get_osfhandle(fd);
+	HANDLE hFile = CreateFileA(fname
+		, GENERIC_READ |(writable ? GENERIC_WRITE : 0)
+		, FILE_SHARE_DELETE | FILE_SHARE_READ
+		, NULL // lpSecurityAttributes
+		, OPEN_EXISTING
+		, FILE_ATTRIBUTE_NORMAL
+		, NULL // hTemplateFile 
+		);
+	if (INVALID_HANDLE_VALUE == hFile) {
+		DWORD err = GetLastError();
+		THROW_STD(logic_error, "CreateFile(fname=%s).Err=%d(%X)"
+			, fname, err, err);
+	}
 	if (!GetFileSizeEx(hFile, &lsize)) {
 		DWORD err = GetLastError();
-		::_close(fd);
+		CloseHandle(hFile);
 		THROW_STD(logic_error, "GetFileSizeEx(fname=%s).Err=%d(%X)"
 			, fname, err, err);
 	}
 	if (lsize.QuadPart > size_t(-1)) {
-		::_close(fd);
+		CloseHandle(hFile);
 		THROW_STD(logic_error, "fname=%s fsize=%I64u(%I64X) too large"
 			, fname, lsize.QuadPart, lsize.QuadPart);
 	}
@@ -58,7 +63,7 @@ void* mmap_load(const char* fname, size_t* fsize, bool writable) {
 	HANDLE hMmap = CreateFileMapping(hFile, NULL, flProtect, 0, 0, NULL);
 	if (NULL == hMmap) {
 		DWORD err = GetLastError();
-		::_close(fd);
+		CloseHandle(hFile);
 		THROW_STD(runtime_error, "CreateFileMapping(fname=%s).Err=%d(0x%X)"
 			, fname, err, err);
 	}
@@ -67,20 +72,35 @@ void* mmap_load(const char* fname, size_t* fsize, bool writable) {
 	if (NULL == base) {
 		DWORD err = GetLastError();
 		::CloseHandle(hMmap);
-		::_close(fd);
+		::CloseHandle(hFile);
 		THROW_STD(runtime_error, "MapViewOfFile(fname=%s).Err=%d(0x%X)"
 			, fname, err, err);
 	}
+	if (populate) {
+		WIN32_MEMORY_RANGE_ENTRY vm;
+		vm.VirtualAddress = base;
+		vm.NumberOfBytes  = *fsize;
+		PrefetchVirtualMemory(GetCurrentProcess(), 1, &vm, 0);
+	}
 	::CloseHandle(hMmap); // close before UnmapViewOfFile is OK
-	::_close(fd);
+	::CloseHandle(hFile);
 #else
+	int openFlags = writable ? O_RDWR : O_RDONLY;
+	int fd = ::open(fname, openFlags);
+	if (fd < 0) {
+		int err = errno;
+		THROW_STD(logic_error, "open(fname=%s, %s) = %d(%X): %s"
+			, fname, writable ? "O_RDWR" : "O_RDONLY"
+			, err, err, strerror(err));
+	}
 	struct stat st;
 	if (::fstat(fd, &st) < 0) {
 		THROW_STD(logic_error, "stat(fname=%s) = %s", fname, strerror(errno));
 	}
 	*fsize = st.st_size;
 	int flProtect = (writable ? PROT_WRITE : 0) | PROT_READ;
-	void* base = ::mmap(NULL, st.st_size, flProtect, MAP_SHARED, fd, 0);
+	int flags = MAP_SHARED | (populate ? MAP_POPULATE : 0);
+	void* base = ::mmap(NULL, st.st_size, flProtect, flags, fd, 0);
 	if (MAP_FAILED == base) {
 		::close(fd);
 		THROW_STD(logic_error, "mmap(fname=%s, %s SHARED, size=%lld) = %s"

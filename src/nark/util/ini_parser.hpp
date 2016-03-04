@@ -19,13 +19,13 @@
 #include <string>
 #include <memory>
 
-#include "../config.hpp" // only for FEBIRD_DLL_EXPORT
+#include "../config.hpp" // only for NARK_DLL_EXPORT
 #include "../num_to_str.hpp"
 #include <sstream>
 
 namespace nark {
 
-class FEBIRD_DLL_EXPORT ini_parser
+class NARK_DLL_EXPORT ini_parser
 {
 	ini_parser(const ini_parser&);
 	const ini_parser& operator=(const ini_parser&);

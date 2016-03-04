@@ -17,29 +17,29 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#  if defined(FEBIRD_CREATE_DLL)
+#  if defined(NARK_CREATE_DLL)
 #    pragma warning(disable: 4251)
-#    define FEBIRD_DLL_EXPORT __declspec(dllexport)      // creator of dll
+#    define NARK_DLL_EXPORT __declspec(dllexport)      // creator of dll
 #    if defined(_DEBUG) || !defined(NDEBUG)
 #//	   pragma message("creating nark-d.lib")
 #    else
 #//	   pragma message("creating nark-r.lib")
 #    endif
-#  elif defined(FEBIRD_USE_DLL)
+#  elif defined(NARK_USE_DLL)
 #    pragma warning(disable: 4251)
-#    define FEBIRD_DLL_EXPORT __declspec(dllimport)      // user of dll
+#    define NARK_DLL_EXPORT __declspec(dllimport)      // user of dll
 #    if defined(_DEBUG) || !defined(NDEBUG)
 //#	   pragma comment(lib, "nark-d.lib")
 #    else
 //#	   pragma comment(lib, "nark-r.lib")
 #    endif
 #  else
-#    define FEBIRD_DLL_EXPORT                            // static lib creator or user
+#    define NARK_DLL_EXPORT                            // static lib creator or user
 #  endif
 
 #else /* _MSC_VER */
 
-#  define FEBIRD_DLL_EXPORT
+#  define NARK_DLL_EXPORT
 
 #endif /* _MSC_VER */
 
@@ -92,10 +92,10 @@
 	  defined(__ia64) || defined(__itanium__) || \
 	  defined(__x86_64) || defined(__x86_64__) ) || \
     defined(__WORD_SIZE) && __WORD_SIZE == 64
-  #define FEBIRD_WORD_BITS 64
+  #define NARK_WORD_BITS 64
   #define NARK_IF_WORD_BITS_64(Then, Else) Then
 #else
-  #define FEBIRD_WORD_BITS 32
+  #define NARK_WORD_BITS 32
   #define NARK_IF_WORD_BITS_64(Then, Else) Else
 #endif
 

@@ -107,6 +107,12 @@ struct CompareBy_offset {
 		return x.offset < y.offset;
 	}
 };
+struct CompareBy_seq_id {
+	template<class T>
+	bool operator()(const T& x, const T& y) const {
+		return x.seq_id < y.seq_id;
+	}
+};
 struct CompareBy_lex_lenDesc {
 	const byte* base;
 	CompareBy_lex_lenDesc(const byte* base1) : base(base1) {}
@@ -126,6 +132,13 @@ struct CompareBy_pos_lenDesc {
 		return x.length > y.length; // lenDesc
 	}
 };
+
+void SortableStrVec::sort_by_offset() {
+	std::sort(m_index.begin(), m_index.end(), CompareBy_offset());
+}
+void SortableStrVec::sort_by_seq_id() {
+	std::sort(m_index.begin(), m_index.end(), CompareBy_seq_id());
+}
 
 void SortableStrVec::build_subkeys(valvec<SEntry>& subkeys) {
 	byte* base = m_strpool.data();
@@ -194,7 +207,6 @@ void SortableStrVec::compress_strpool_level_1() {
 	std::sort(m_index.begin(), m_index.end(), CompareBy_lex_lenDesc(m_strpool.data()));
 	valvec<byte> strpool(m_strpool.size() + 3, valvec_reserve());
 	for (size_t i = 0; i < m_index.size(); ++i) {
-		assert(m_index[i].length >= 3);
 		strpool.append((*this)[i]);
 	}
 	size_t offset = 0;
@@ -216,12 +228,13 @@ void SortableStrVec::compress_strpool_level_1() {
 		}
 	}
 	assert(offset <= strpool.size());
-#if 0
-	if (offset < strpool.size()) {
-		long oldsize = strpool.size(), newsize = offset;
-		fprintf(stderr, "dedup: oldsize=%ld newsize=%ld\n", oldsize, newsize);
+	if (const char* env = getenv("SortableStrVec_statCompressLevel1")) {
+		int showIt = atoi(env);
+		if (showIt) {
+			long oldsize = strpool.size(), newsize = offset;
+			fprintf(stderr, "SortableStrVec::compress1: oldsize=%ld newsize=%ld\n", oldsize, newsize);
+		}
 	}
-#endif
 	strpool.risk_set_size(offset + 3);
 	strpool.fill(offset, 3, 0);
 	strpool.shrink_to_fit();
@@ -238,6 +251,7 @@ void SortableStrVec::compress_strpool_level_2() {
 	size_t prevOldPos = size_t(-1);
 	byte* pool = m_strpool.data();
 	for(size_t i = 0; i < m_index.size(); ++i) {
+		assert(m_index[i].length >= 3);
 		size_t len = m_index[i].length;
 		size_t pos = m_index[i].offset;
 		if (pos == prevOldPos) {
@@ -563,6 +577,29 @@ size_t SortableStrVec::lower_bound(fstring key) const {
 
 size_t SortableStrVec::upper_bound(fstring key) const {
 	return upper_bound_0<const SortableStrVec&>(*this, m_index.size(), key);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+DataStore::DataStore() {
+	m_numRecords = 0;
+}
+DataStore::~DataStore() {
+}
+
+void DataStore::risk_swap(DataStore& y) {
+	std::swap(m_numRecords, y.m_numRecords);
+}
+
+void DataStore::get_record(size_t recID, valvec<byte_t>* recData) const {
+	recData->erase_all();
+	get_record_append(recID, recData);
+}
+
+valvec<byte_t> DataStore::get_record(size_t recID) const {
+	valvec<byte_t> data;
+	get_record(recID, &data);
+	return data;
 }
 
 } // namespace nark

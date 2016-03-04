@@ -63,8 +63,8 @@ Accepts UTF-32 code points and forwards them on as UTF-16 code points.
 
 ****************************************************************************/
 
-#ifndef __FEBIRD_UTIL_UNICODE_ITERATOR_HPP__
-#define __FEBIRD_UTIL_UNICODE_ITERATOR_HPP__
+#ifndef __NARK_UTIL_UNICODE_ITERATOR_HPP__
+#define __NARK_UTIL_UNICODE_ITERATOR_HPP__
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -836,5 +836,5 @@ make_utf8_output_iter(BaseIterator bi) {
 
 } // namespace nark
 
-#endif // __FEBIRD_UTIL_UNICODE_ITERATOR_HPP__
+#endif // __NARK_UTIL_UNICODE_ITERATOR_HPP__
 

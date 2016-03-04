@@ -4,6 +4,7 @@
 #include "bitmanip.hpp"
 #include "stdtypes.hpp"
 #include "valvec.hpp"
+#include <boost/mpl/bool.hpp>
 
 namespace nark {
 
@@ -71,7 +72,7 @@ public:
     BlockT  block(int i) const { return bm[i]; }
     BlockT& block(int i)       { return bm[i]; }
 
-#define FEBIRD_DefineBitMapBinaryOperator(OP, Expression) \
+#define NARK_DefineBitMapBinaryOperator(OP, Expression) \
 	static_bitmap& operator OP(const static_bitmap& that) { \
 		for (int i = 0; i < BlockN-(ExtraBits?1:0); ++i) { \
 			BlockT& x = this->bm[i]; \
@@ -86,11 +87,11 @@ public:
 		return *this; \
 	}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	FEBIRD_DefineBitMapBinaryOperator(-=, x &~y)
-	FEBIRD_DefineBitMapBinaryOperator(+=, x | y) // same as |=
-	FEBIRD_DefineBitMapBinaryOperator(|=, x | y)
-	FEBIRD_DefineBitMapBinaryOperator(^=, x ^ y)
-	FEBIRD_DefineBitMapBinaryOperator(&=, x & y)
+	NARK_DefineBitMapBinaryOperator(-=, x &~y)
+	NARK_DefineBitMapBinaryOperator(+=, x | y) // same as |=
+	NARK_DefineBitMapBinaryOperator(|=, x | y)
+	NARK_DefineBitMapBinaryOperator(^=, x ^ y)
+	NARK_DefineBitMapBinaryOperator(&=, x & y)
 
     static_bitmap& operator<<=(int n) { shl(n); return *this; }
     void shl(int n, int realBlocks = BlockN) { // shift bit left
@@ -242,7 +243,7 @@ public:
     }
 };
 
-class FEBIRD_DLL_EXPORT febitvec {
+class NARK_DLL_EXPORT febitvec {
 protected:
     bm_uint_t* m_words;
 	size_t m_size;
@@ -273,12 +274,15 @@ public:
 
 	void append(const febitvec& y);
 	void append(const febitvec& y, size_t beg, size_t len);
+	void assign(const febitvec&);
+	void risk_memcpy(const febitvec&);
 	void copy(size_t destBeg, const febitvec& y);
 	void copy(size_t destBeg, const febitvec& y, size_t srcBeg, size_t len);
 
 	void clear();
 	void erase_all();
 	void fill(bool val);
+	void grow(size_t cnt, bool val=false);
 	void reserve(size_t newcap);
     void resize(size_t newsize, bool val=false);
 	void resize_no_init(size_t newsize);
@@ -304,6 +308,8 @@ public:
 		assert(m_size < m_capacity);
 		this->set(m_size++, val);
 	}
+
+	void pop_back() { assert(m_size > 0); --m_size; }
 
     bool operator[](size_t i) const { // alias of 'is1'
         assert(i < m_size);

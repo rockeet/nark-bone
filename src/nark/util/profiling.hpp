@@ -10,7 +10,7 @@
 
 namespace nark {
 
-	class FEBIRD_DLL_EXPORT profiling
+	class NARK_DLL_EXPORT profiling
 	{
 #if defined(_MSC_VER)
 		long long m_freq;

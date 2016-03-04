@@ -15,6 +15,7 @@
 
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <nark/util/autofree.hpp>
 

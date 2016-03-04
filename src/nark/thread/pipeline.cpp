@@ -1,10 +1,10 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 
 #include "pipeline.hpp"
 #include <nark/circular_queue.hpp>
 #include <nark/num_to_str.hpp>
-#include <nark/util/compare.hpp>
-
+//#include <nark/util/compare.hpp>
+#include <vector>
 //#include <deque>
 //#include <boost/circular_buffer.hpp>
 #include <nark/util/concurrent_queue.hpp>
@@ -19,6 +19,13 @@
 	#include <boost/thread.hpp>
 	#include <boost/bind.hpp>
 	typedef boost::lock_guard<boost::mutex> PipelineLockGuard;
+	#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+		#include <Windows.h>
+		#undef min
+		#undef max
+	#else
+		#include <unistd.h>
+	#endif
 #else
 	typedef std::lock_guard<std::mutex> PipelineLockGuard;
 #endif
@@ -349,8 +356,21 @@ void PipelineStage::run_step_mid(int threadno)
 }
 
 namespace {
-SAME_NAME_MEMBER_COMPARATOR_EX(plserial_greater, uintptr_t, uintptr_t, .plserial, std::greater<uintptr_t>)
-SAME_NAME_MEMBER_COMPARATOR_EX(plserial_less   , uintptr_t, uintptr_t, .plserial, std::less   <uintptr_t>)
+//SAME_NAME_MEMBER_COMPARATOR_EX(plserial_greater, uintptr_t, uintptr_t, .plserial, std::greater<uintptr_t>)
+//SAME_NAME_MEMBER_COMPARATOR_EX(plserial_less   , uintptr_t, uintptr_t, .plserial, std::less   <uintptr_t>)
+
+struct plserial_greater {
+	template<class T>
+	bool operator()(const T& x, const T& y) const {
+		return x.plserial > y.plserial;
+	}
+};
+struct plserial_less {
+	template<class T>
+	bool operator()(const T& x, const T& y) const {
+		return x.plserial < y.plserial;
+	}
+};
 }
 
 void PipelineStage::serial_step_do_mid(PipelineQueueItem& item)
@@ -430,7 +450,7 @@ void PipelineStage::run_serial_step_fast(int threadno,
 	assert(m_threads.size() == 1);
 	assert(0 == threadno);
 	using namespace std;
-	const ptrdiff_t nlen = FEBIRD_IF_DEBUG(4, 64); // should power of 2
+	const ptrdiff_t nlen = NARK_IF_DEBUG(4, 64); // should power of 2
 	ptrdiff_t head = 0;
 	vector<PipelineQueueItem> cache(nlen), overflow;
 	m_plserial = 1; // this is expected_serial
@@ -519,6 +539,20 @@ protected:
 		assert(0);
 	}
 };
+
+int PipelineProcessor::sysCpuCount() {
+#if defined(NARK_CONCURRENT_QUEUE_USE_BOOST)
+  #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+	SYSTEM_INFO sysInfo;
+	GetSystemInfo(&sysInfo);
+	return sysInfo.dwNumberOfProcessors;
+  #else
+	return (int)sysconf(_SC_NPROCESSORS_ONLN);
+  #endif
+#else
+	return (int)std::thread::hardware_concurrency();
+#endif
+}
 
 PipelineProcessor::PipelineProcessor()
   : m_destroyTask(&PipelineProcessor::defaultDestroyTask)

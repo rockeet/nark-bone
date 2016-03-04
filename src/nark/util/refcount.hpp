@@ -32,7 +32,7 @@ public:
 /**
  @brief 一般 RefCounter，使用虚函数实现，用于 boost::nark_ptr
  */
-class FEBIRD_DLL_EXPORT RefCounter
+class NARK_DLL_EXPORT RefCounter
 {
 	DECLARE_NONE_COPYABLE_CLASS(RefCounter)
 	boost::detail::atomic_count nRef;

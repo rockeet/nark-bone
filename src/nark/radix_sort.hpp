@@ -15,7 +15,7 @@
 
 namespace nark {
 
-	class FEBIRD_DLL_EXPORT radix_sorter
+	class NARK_DLL_EXPORT radix_sorter
 	{
 	public:
 		typedef int (*codefun_t)(int ch_, const void* codetab_as_locale);
@@ -103,7 +103,7 @@ namespace nark {
 			unsigned tail;
 			RadixSortMeta() : head(nil), tail(nil) {}
 		};
-		FEBIRD_DLL_EXPORT
+		NARK_DLL_EXPORT
 		size_t collect(unsigned* next_p, size_t next_n,
 					   RadixSortMeta* radix_p, size_t radix_n);
 	}

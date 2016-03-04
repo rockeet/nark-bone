@@ -1,4 +1,4 @@
-/* vim: set tabstop=4 : */
+﻿/* vim: set tabstop=4 : */
 /********************************************************************
 	@file circular_queue.hpp
 	@brief 循环队列的实现

@@ -16,12 +16,12 @@
 namespace nark {
 
 //! forward declaration
-//class FEBIRD_DLL_EXPORT DataBufferPtr;
+//class NARK_DLL_EXPORT DataBufferPtr;
 
 /**
  @brief 只能通过 DataBufferPtr 使用该对象
  */
-class FEBIRD_DLL_EXPORT DataBuffer
+class NARK_DLL_EXPORT DataBuffer
 {
 	boost::detail::atomic_count m_refcount;
 	size_t m_size;
@@ -52,7 +52,7 @@ public:
  -# DataBufferPtr 仅占一个指针的空间
  -# DataBufferPtr 指向的目标是一块连续的内存
  */
-class FEBIRD_DLL_EXPORT DataBufferPtr : public boost::intrusive_ptr<DataBuffer>
+class NARK_DLL_EXPORT DataBufferPtr : public boost::intrusive_ptr<DataBuffer>
 {
 	typedef boost::intrusive_ptr<DataBuffer> MyBase;
 public:
@@ -68,7 +68,7 @@ public:
  -# 如果不是自己拥有的 buffer，仅仅拷贝指针
  -# 直接使用该对象即可，不需要为了效率使用指向该对象的智能指针
  */
-class FEBIRD_DLL_EXPORT SmartBuffer
+class NARK_DLL_EXPORT SmartBuffer
 {
 public:
 	explicit SmartBuffer(size_t size = 0);

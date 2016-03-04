@@ -7,7 +7,7 @@
 namespace nark {
 
 /// lcast_from_str must be an expiring object
-class FEBIRD_DLL_EXPORT lcast_from_str {
+class NARK_DLL_EXPORT lcast_from_str {
 	const char* p;
 	size_t      n; // n maybe not used
 
@@ -49,27 +49,27 @@ inline const lcast_from_str lcast(const char* s, size_t n) { return lcast_from_s
 inline const lcast_from_str lcast(const char* s, const char* t) { return lcast_from_str(s, t-s); }
 inline const lcast_from_str lcast(const char* s) { return lcast_from_str(s, strlen(s)); }
 
-FEBIRD_DLL_EXPORT std::string lcast(char x);
-FEBIRD_DLL_EXPORT std::string lcast(signed char x);
-FEBIRD_DLL_EXPORT std::string lcast(unsigned char x);
-FEBIRD_DLL_EXPORT std::string lcast(int x);
-FEBIRD_DLL_EXPORT std::string lcast(unsigned int x);
-FEBIRD_DLL_EXPORT std::string lcast(short x);
-FEBIRD_DLL_EXPORT std::string lcast(unsigned short x);
-FEBIRD_DLL_EXPORT std::string lcast(long x);
-FEBIRD_DLL_EXPORT std::string lcast(unsigned long x);
-FEBIRD_DLL_EXPORT std::string lcast(long long x);
-FEBIRD_DLL_EXPORT std::string lcast(unsigned long long x);
-FEBIRD_DLL_EXPORT std::string lcast(float x);
-FEBIRD_DLL_EXPORT std::string lcast(double x);
-FEBIRD_DLL_EXPORT std::string lcast(long double x);
+NARK_DLL_EXPORT std::string lcast(char x);
+NARK_DLL_EXPORT std::string lcast(signed char x);
+NARK_DLL_EXPORT std::string lcast(unsigned char x);
+NARK_DLL_EXPORT std::string lcast(int x);
+NARK_DLL_EXPORT std::string lcast(unsigned int x);
+NARK_DLL_EXPORT std::string lcast(short x);
+NARK_DLL_EXPORT std::string lcast(unsigned short x);
+NARK_DLL_EXPORT std::string lcast(long x);
+NARK_DLL_EXPORT std::string lcast(unsigned long x);
+NARK_DLL_EXPORT std::string lcast(long long x);
+NARK_DLL_EXPORT std::string lcast(unsigned long long x);
+NARK_DLL_EXPORT std::string lcast(float x);
+NARK_DLL_EXPORT std::string lcast(double x);
+NARK_DLL_EXPORT std::string lcast(long double x);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // HEX Lexical cast
 
 /// lcast_from_str must be an expiring object
-class FEBIRD_DLL_EXPORT hexlcast_from_str {
+class NARK_DLL_EXPORT hexlcast_from_str {
 	const char* p;
 	size_t      n; // n maybe not used
 
@@ -107,17 +107,17 @@ inline const hexlcast_from_str hexlcast(const char* s, size_t n) { return hexlca
 inline const hexlcast_from_str hexlcast(const char* s, const char* t) { return hexlcast_from_str(s, t-s); }
 inline const hexlcast_from_str hexlcast(const char* s) { return hexlcast_from_str(s, strlen(s)); }
 
-FEBIRD_DLL_EXPORT std::string hexlcast(char x);
-FEBIRD_DLL_EXPORT std::string hexlcast(signed char x);
-FEBIRD_DLL_EXPORT std::string hexlcast(unsigned char x);
-FEBIRD_DLL_EXPORT std::string hexlcast(int x);
-FEBIRD_DLL_EXPORT std::string hexlcast(unsigned int x);
-FEBIRD_DLL_EXPORT std::string hexlcast(short x);
-FEBIRD_DLL_EXPORT std::string hexlcast(unsigned short x);
-FEBIRD_DLL_EXPORT std::string hexlcast(long x);
-FEBIRD_DLL_EXPORT std::string hexlcast(unsigned long x);
-FEBIRD_DLL_EXPORT std::string hexlcast(long long x);
-FEBIRD_DLL_EXPORT std::string hexlcast(unsigned long long x);
+NARK_DLL_EXPORT std::string hexlcast(char x);
+NARK_DLL_EXPORT std::string hexlcast(signed char x);
+NARK_DLL_EXPORT std::string hexlcast(unsigned char x);
+NARK_DLL_EXPORT std::string hexlcast(int x);
+NARK_DLL_EXPORT std::string hexlcast(unsigned int x);
+NARK_DLL_EXPORT std::string hexlcast(short x);
+NARK_DLL_EXPORT std::string hexlcast(unsigned short x);
+NARK_DLL_EXPORT std::string hexlcast(long x);
+NARK_DLL_EXPORT std::string hexlcast(unsigned long x);
+NARK_DLL_EXPORT std::string hexlcast(long long x);
+NARK_DLL_EXPORT std::string hexlcast(unsigned long long x);
 
 } // namespace nark
 

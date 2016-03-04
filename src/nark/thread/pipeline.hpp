@@ -42,13 +42,13 @@ namespace nark {
 	#define NarkFuncBind std::bind
 #endif
 
-class FEBIRD_DLL_EXPORT PipelineTask
+class NARK_DLL_EXPORT PipelineTask
 {
 public:
 	virtual ~PipelineTask();
 };
 
-class FEBIRD_DLL_EXPORT PipelineQueueItem
+class NARK_DLL_EXPORT PipelineQueueItem
 {
 public:
 	uintptr_t plserial;
@@ -65,9 +65,9 @@ public:
 	{}
 };
 
-class FEBIRD_DLL_EXPORT PipelineProcessor;
+class NARK_DLL_EXPORT PipelineProcessor;
 
-class FEBIRD_DLL_EXPORT PipelineStage
+class NARK_DLL_EXPORT PipelineStage
 {
 	friend class PipelineProcessor;
 
@@ -81,7 +81,7 @@ protected:
 	PipelineStage *m_prev, *m_next;
 	PipelineProcessor* m_owner;
 
-	struct FEBIRD_DLL_EXPORT ThreadData
+	struct NARK_DLL_EXPORT ThreadData
 	{
 		std::string m_err_text;
 		thread*  m_thread;
@@ -143,7 +143,7 @@ public:
 	void setOutQueueSize(int size);
 };
 
-class FEBIRD_DLL_EXPORT FunPipelineStage : public PipelineStage
+class NARK_DLL_EXPORT FunPipelineStage : public PipelineStage
 {
 	function<void(PipelineStage*, int, PipelineQueueItem*)> m_process; // take(this, threadno, task)
 
@@ -157,7 +157,7 @@ public:
 	~FunPipelineStage(); // move destructor into libnark-thread*
 };
 
-class FEBIRD_DLL_EXPORT PipelineProcessor
+class NARK_DLL_EXPORT PipelineProcessor
 {
 	friend class PipelineStage;
 
@@ -179,6 +179,8 @@ protected:
 
 public:
 	bool m_silent; // set to true to depress status messages
+
+	static int sysCpuCount();
 
 	PipelineProcessor();
 

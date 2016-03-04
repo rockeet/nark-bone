@@ -87,7 +87,7 @@ inline SizeT align_down(SizeT size, AlignT align_size)
 	return size - size % align_size;
 }
 
-#define FEBIRD_HAS_BSET(set, subset) (((set) & (subset)) == (subset))
+#define NARK_HAS_BSET(set, subset) (((set) & (subset)) == (subset))
 
 /*
  * iter = s.end();
@@ -127,16 +127,16 @@ private:											\
 #	define DEBUG_printf		printf
 #	define DEBUG_fprintf	fprintf
 #	define DEBUG_fflush		fflush
-#	define FEBIRD_IF_DEBUG(Then, Else)  Then
-#	define FEBIRD_RT_assert(exp, ExceptionT)  assert(exp)
+#	define NARK_IF_DEBUG(Then, Else)  Then
+#	define NARK_RT_assert(exp, ExceptionT)  assert(exp)
 #else
 #	define DEBUG_only(S)
 #	define DEBUG_perror(Msg)
 #	define DEBUG_printf		1 ? (void)0 : (void)printf
 #	define DEBUG_fprintf	1 ? (void)0 : (void)fprintf
 #	define DEBUG_fflush(fp)
-#	define FEBIRD_IF_DEBUG(Then, Else)  Else
-#	define FEBIRD_RT_assert(exp, ExceptionT)  \
+#	define NARK_IF_DEBUG(Then, Else)  Else
+#	define NARK_RT_assert(exp, ExceptionT)  \
 	if (!(exp)) { \
 		string_appender<> oss;\
 		oss << "expression=\"" << #exp << "\", exception=\"" << #ExceptionT << "\"\n" \

@@ -39,16 +39,16 @@ namespace nark {
 		#undef  SP_ALIGN
 		#define SP_ALIGN 1
 	#endif
-#elif defined(FEBIRD_WORD_BITS)
-	#if 64 == FEBIRD_WORD_BITS
+#elif defined(NARK_WORD_BITS)
+	#if 64 == NARK_WORD_BITS
 	  #define SP_ALIGN 8
-	#elif 32 == FEBIRD_WORD_BITS
+	#elif 32 == NARK_WORD_BITS
 	  #define SP_ALIGN 4
 	#else
-	  #error FEBIRD_WORD_BITS is invalid
+	  #error NARK_WORD_BITS is invalid
 	#endif
 #else
-	#error FEBIRD_WORD_BITS is not defined
+	#error NARK_WORD_BITS is not defined
 #endif
 
 #if SP_ALIGN == 4
@@ -91,7 +91,7 @@ inline size_t nark_fstrlen(const uint16_t* s) {
 }
 
 #ifdef _MSC_VER
-FEBIRD_DLL_EXPORT
+NARK_DLL_EXPORT
 char*
 nark_fstrstr(const char* haystack, size_t haystack_len
 		   , const char* needle  , size_t needle_len);
@@ -104,7 +104,7 @@ nark_fstrstr(const char* haystack, size_t haystack_len
 }
 #endif
 
-FEBIRD_DLL_EXPORT
+NARK_DLL_EXPORT
 uint16_t*
 nark_fstrstr(const uint16_t* haystack, size_t haystack_len
 		   , const uint16_t* needle  , size_t needle_len);
@@ -268,10 +268,11 @@ struct basic_fstring {
 		if (' ' == delim) {
 		   	// same as awk, skip first blank field, and skip dup blanks
 			const Char *col = p, *End = p + n;
-			while (col < End && isspace(*col)) ++col; // skip first blank field
+			while (col < End && isspace((unsigned char)(*col)))
+				 ++col; // skip first blank field
 			while (col < End && F->size()+1 < max_fields) {
 				const Char* next = col;
-				while (next < End && !isspace(*next)) ++next;
+				while (next < End && !isspace((unsigned char)(*next))) ++next;
 				F->push_back(typename Vec::value_type(col, next));
 				while (next < End &&  isspace(*next)) ++next; // skip blanks
 				col = next;
@@ -329,7 +330,7 @@ template<> struct char_to_fstring<char> { typedef fstring type; };
 template<> struct char_to_fstring<unsigned char> { typedef fstring type; };
 template<> struct char_to_fstring<uint16_t> { typedef fstring16 type; };
 
-FEBIRD_DLL_EXPORT
+NARK_DLL_EXPORT
 std::string operator+(fstring x, fstring y);
 inline std::string operator+(fstring x, const char* y) {return x+fstring(y);}
 inline std::string operator+(const char* x, fstring y) {return fstring(x)+y;}
@@ -338,26 +339,26 @@ inline std::string operator+(std::string&& x, fstring y) { return x.append(   y.
 inline std::string operator+(fstring x, std::string&& y) { return y.insert(0, x.p, x.n); }
 #endif
 
-FEBIRD_DLL_EXPORT bool operator==(fstring x, fstring y);
-FEBIRD_DLL_EXPORT bool operator!=(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator==(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator!=(fstring x, fstring y);
 
-FEBIRD_DLL_EXPORT bool operator<(fstring x, fstring y);
-FEBIRD_DLL_EXPORT bool operator>(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator<(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator>(fstring x, fstring y);
 
-FEBIRD_DLL_EXPORT bool operator<=(fstring x, fstring y);
-FEBIRD_DLL_EXPORT bool operator>=(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator<=(fstring x, fstring y);
+NARK_DLL_EXPORT bool operator>=(fstring x, fstring y);
 
-FEBIRD_DLL_EXPORT std::ostream& operator<<(std::ostream& os, fstring s);
+NARK_DLL_EXPORT std::ostream& operator<<(std::ostream& os, fstring s);
 
 // fstring16
-FEBIRD_DLL_EXPORT bool operator==(fstring16 x, fstring16 y);
-FEBIRD_DLL_EXPORT bool operator!=(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator==(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator!=(fstring16 x, fstring16 y);
 
-FEBIRD_DLL_EXPORT bool operator<(fstring16 x, fstring16 y);
-FEBIRD_DLL_EXPORT bool operator>(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator<(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator>(fstring16 x, fstring16 y);
 
-FEBIRD_DLL_EXPORT bool operator<=(fstring16 x, fstring16 y);
-FEBIRD_DLL_EXPORT bool operator>=(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator<=(fstring16 x, fstring16 y);
+NARK_DLL_EXPORT bool operator>=(fstring16 x, fstring16 y);
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -543,8 +544,8 @@ struct fstring_func {
 #endif // SP_ALIGN
 };
 
-FEBIRD_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
-FEBIRD_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
+NARK_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
+NARK_DLL_EXPORT extern unsigned char gtab_ascii_tolower[256];
 
 } // namespace nark
 

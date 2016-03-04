@@ -6,10 +6,10 @@
 
 namespace nark {
 
-class FEBIRD_DLL_EXPORT SortableStrVec {
+class NARK_DLL_EXPORT SortableStrVec {
 public:
 #pragma pack(push, 4)
-#if FEBIRD_WORD_BITS == 64
+#if NARK_WORD_BITS == 64
 	struct SEntry {
 		uint64_t offset : 40; //  1T
 		uint64_t length : 24; // 16M
@@ -52,6 +52,8 @@ public:
 	void back_grow_no_init(size_t nGrow);
 	void reverse_keys();
 	void sort();
+	void sort_by_offset();
+	void sort_by_seq_id();
 	void clear();
 	void build_subkeys(valvec<SEntry>& subkeys);
 	void compact();
@@ -85,6 +87,22 @@ private:
 		dio.ensureWrite(x.m_index.data(), x.m_index.used_mem_size());
 		dio.ensureWrite(x.m_strpool.data(), x.m_strpool.used_mem_size());
 	}
+};
+
+class NARK_DLL_EXPORT DataStore {
+protected:
+	size_t m_numRecords;
+	void risk_swap(DataStore& y);
+public:
+	static DataStore* load_from(fstring fpath);
+	DataStore();
+	virtual ~DataStore();
+	size_t num_records() const { return m_numRecords; }
+	virtual size_t mem_size() const = 0;
+	virtual long long total_data_size() const = 0;
+	virtual void get_record_append(size_t recID, valvec<byte_t>* recData) const = 0;
+	void get_record(size_t recID, valvec<byte_t>* recData) const;
+	valvec<byte_t> get_record(size_t recID) const;
 };
 
 } // namespace nark

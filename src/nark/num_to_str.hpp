@@ -8,19 +8,19 @@
 
 namespace nark {
 
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, bool x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, short x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, int x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, long x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, long long x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, unsigned short x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, unsigned int x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, unsigned long x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, unsigned long long x);
+NARK_DLL_EXPORT int num_to_str(char* buf, bool x);
+NARK_DLL_EXPORT int num_to_str(char* buf, short x);
+NARK_DLL_EXPORT int num_to_str(char* buf, int x);
+NARK_DLL_EXPORT int num_to_str(char* buf, long x);
+NARK_DLL_EXPORT int num_to_str(char* buf, long long x);
+NARK_DLL_EXPORT int num_to_str(char* buf, unsigned short x);
+NARK_DLL_EXPORT int num_to_str(char* buf, unsigned int x);
+NARK_DLL_EXPORT int num_to_str(char* buf, unsigned long x);
+NARK_DLL_EXPORT int num_to_str(char* buf, unsigned long long x);
 
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, float x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, double x);
-FEBIRD_DLL_EXPORT int num_to_str(char* buf, long double x);
+NARK_DLL_EXPORT int num_to_str(char* buf, float x);
+NARK_DLL_EXPORT int num_to_str(char* buf, double x);
+NARK_DLL_EXPORT int num_to_str(char* buf, long double x);
 
 template<class String = std::string>
 struct string_appender : public String {
