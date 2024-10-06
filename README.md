@@ -1,5 +1,6 @@
 nark-core
 =========
+## Now the newest version is in [topling-ark](https://github.com/topling/topling-ark)
 
 Core utilities of nark library
 
